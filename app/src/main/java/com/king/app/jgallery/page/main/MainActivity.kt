@@ -12,6 +12,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
     var ftImage = ImageFragment()
+    var ftAlbum: AlbumFragment? = null
 
     override fun getContentView(): Int =
         R.layout.activity_main
@@ -45,8 +46,39 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fl_ft, ftImage, "ImageFragment")
             .commit()
+        mBinding.tvImage.isSelected = true
+
+        mBinding.tvImage.setOnClickListener { showImagePage() }
+        mBinding.tvAlbum.setOnClickListener { showAlbumPage() }
 
         mModel.allImages.observe(this, Observer { ftImage.showItems(it) })
+        mModel.folderImages.observe(this, Observer { ftAlbum!!.showAlbumItems(it) })
+    }
+
+    private fun showImagePage() {
+        mBinding.tvImage.isSelected = true
+        mBinding.tvAlbum.isSelected = false
+        var transaction = supportFragmentManager.beginTransaction()
+        transaction.show(ftImage)
+        if (ftAlbum != null) {
+            transaction.hide(ftAlbum!!)
+        }
+        transaction.commit()
+    }
+
+    private fun showAlbumPage() {
+        mBinding.tvAlbum.isSelected = true
+        mBinding.tvImage.isSelected = false
+        var transaction = supportFragmentManager.beginTransaction()
+        if (ftAlbum == null) {
+            ftAlbum = AlbumFragment()
+            transaction.add(R.id.fl_ft, ftAlbum!!, "AlbumFragment")
+        }
+        else {
+            transaction.show(ftAlbum!!)
+        }
+        transaction.hide(ftImage)
+        transaction.commit()
     }
 
 }

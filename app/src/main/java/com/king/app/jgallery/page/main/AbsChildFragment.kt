@@ -12,7 +12,12 @@ import com.king.app.jgallery.base.BaseViewModel
  */
 abstract class AbsChildFragment<T: ViewDataBinding, VM: BaseViewModel>: BaseFragment<T, VM>() {
 
+    private var mainViewModel: MainViewModel ? = null
+
     fun getMainViewModel(): MainViewModel {
-        return ViewModelProviders.of(activity!!).get(MainViewModel::class.java)
+        if (mainViewModel == null) {
+            mainViewModel = ViewModelProviders.of(activity!!).get(MainViewModel::class.java)
+        }
+        return mainViewModel!!
     }
 }

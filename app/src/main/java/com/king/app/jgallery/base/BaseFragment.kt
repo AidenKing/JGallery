@@ -32,6 +32,8 @@ abstract class BaseFragment<T : ViewDataBinding, VM: BaseViewModel>: RootFragmen
 
     fun generateViewModel(vm: Class<VM>) = ViewModelProvider(this, ViewModelFactory(JGApplication.instance)).get(vm)
 
+    fun emptyViewModel(): EmptyViewModel = ViewModelProvider(this, ViewModelFactory(JGApplication.instance)).get(EmptyViewModel::class.java)
+
     fun <AVM: AndroidViewModel> getActivityViewModel(vm: Class<AVM>): AVM = ViewModelProvider(activity!!.viewModelStore, ViewModelFactory(JGApplication.instance)).get(vm)
 
     override fun onCreateView(

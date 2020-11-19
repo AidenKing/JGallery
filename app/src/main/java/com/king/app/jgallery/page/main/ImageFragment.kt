@@ -20,7 +20,7 @@ class ImageFragment: AbsChildFragment<FragmentImageBinding, EmptyViewModel>() {
 
     override fun getBinding(inflater: LayoutInflater): FragmentImageBinding = FragmentImageBinding.inflate(inflater)
 
-    override fun createViewModel(): EmptyViewModel = generateViewModel(EmptyViewModel::class.java)
+    override fun createViewModel(): EmptyViewModel = emptyViewModel()
 
     override fun initView(view: View) {
         mBinding.rvList.layoutManager = GridLayoutManager(context, 4)

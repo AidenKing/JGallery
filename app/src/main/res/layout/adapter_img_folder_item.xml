@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="bean"
+            type="com.king.app.jgallery.page.main.FolderItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_item"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:layout_margin="5dp"
+            app:itemUrl="@{bean.imgUrl}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:text="@{bean.name}"
+            app:layout_constraintTop_toBottomOf="@+id/iv_item"
+            app:layout_constraintStart_toStartOf="@+id/iv_item"
+            app:layout_constraintEnd_toEndOf="@+id/iv_item"
+            tools:text="File name"/>
+
+        <TextView
+            android:id="@+id/tv_num"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="@{String.valueOf(bean.childNum)}"
+            app:layout_constraintTop_toBottomOf="@+id/tv_name"
+            app:layout_constraintStart_toStartOf="@+id/iv_item"
+            app:layout_constraintEnd_toEndOf="@+id/iv_item"
+            tools:text="133"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -22,6 +22,10 @@ class MainViewModel(application: Application): BaseViewModel(application) {
 
     var allImages = MutableLiveData<List<FileItem>>()
 
+    var folderList = mutableListOf<FolderItem>()
+
+    var folderImages = MutableLiveData<List<FileItem>>()
+
     val IMAGE = "image"
     val VIDEO = "video"
     private val DURATION = "duration"
@@ -64,8 +68,6 @@ class MainViewModel(application: Application): BaseViewModel(application) {
         MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
     )
     private val ORDER_BY = MediaStore.Files.FileColumns.DATE_ADDED + " DESC"
-
-    private var folderList = mutableListOf<FolderItem>()
 
     fun loadAll() {
         getAllResource()
@@ -159,7 +161,39 @@ class MainViewModel(application: Application): BaseViewModel(application) {
                 return folder
             }
         }
-        return FolderItem(folderFile.name, folderFile.path)
+        var folder = FolderItem(folderFile.name, folderFile.path)
+        // 第一张作为封面
+        folder.imgUrl = path
+        folderList.add(folder)
+        return folder
+    }
+
+    fun selectFolder(folderItem: FolderItem) {
+        var list = mutableListOf<FileItem>()
+        var file = File(folderItem.path)
+        if (file.exists()) {
+            var files = file.listFiles()
+            files.let {
+                for (f in it) {
+                    var type: String? = getFileType(f.name) ?: continue
+                    if (type == VIDEO) {
+                        // TODO 查询视频时长
+                    }
+                    var item = FileItem(type!!, f.path)
+                    list.add(item)
+                }
+            }
+        }
+        folderImages.value = list
+    }
+
+    private fun getFileType(name: String): String? {
+        var extra = name.substring(name.lastIndexOf(".") + 1)
+        return when(extra) {
+            "png", "jpg", "jpeg", "gif", "bmp", "webp" -> IMAGE
+            "mp4", "avi", "mkv", "wmv", "rmvb", "mov", "mpeg", "3gp", "rm", "flv" -> VIDEO
+            else -> null
+        }
     }
 
 }

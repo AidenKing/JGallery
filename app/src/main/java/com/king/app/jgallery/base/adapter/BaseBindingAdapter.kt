@@ -35,7 +35,7 @@ abstract class BaseBindingAdapter<V : ViewDataBinding, T> : RecyclerView.Adapter
         val holder = BindingHolder(binding.root)
         holder.itemView.setOnClickListener { v ->
             val position = holder.layoutPosition
-            onClickItem(v, position)
+            onClickItem(v, position, list!![position])
         }
         if (listenerLongClick != null) {
             holder.itemView.setOnLongClickListener { v ->
@@ -61,7 +61,7 @@ abstract class BaseBindingAdapter<V : ViewDataBinding, T> : RecyclerView.Adapter
 
     protected abstract fun onBindItem(binding: V, position: Int, bean: T)
 
-    open fun onClickItem(v: View, position: Int) {
+    open fun onClickItem(v: View, position: Int, bean: T) {
         if (listenerClick != null) {
             listenerClick!!.onClickItem(v, position, list!![position])
         }

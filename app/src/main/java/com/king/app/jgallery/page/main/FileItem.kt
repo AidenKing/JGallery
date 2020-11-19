@@ -24,5 +24,6 @@ data class FileItem(
 data class FolderItem (
     var name: String,
     var path: String,
+    var imgUrl: String? = null,
     var childNum: Int = 0
 )

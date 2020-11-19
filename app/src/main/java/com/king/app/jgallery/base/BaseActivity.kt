@@ -58,6 +58,8 @@ abstract class BaseActivity<T : ViewDataBinding, VM : BaseViewModel> : RootActiv
 
     fun generateViewModel(vm: Class<VM>) = ViewModelProvider(this, ViewModelFactory(JGApplication.instance)).get(vm)
 
+    fun emptyViewModel(): EmptyViewModel = ViewModelProvider(this, ViewModelFactory(JGApplication.instance)).get(EmptyViewModel::class.java)
+
     protected abstract fun initView()
 
     protected abstract fun initData()

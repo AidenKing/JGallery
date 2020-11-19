@@ -15,4 +15,5 @@
     <color name="text_sub">#999999</color>
     <color name="text_second">#666666</color>
     <color name="white">#ffffff</color>
+    <color name="folder_focus">#EFADAD</color>
 </resources>

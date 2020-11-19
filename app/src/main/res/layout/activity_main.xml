@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".page.main.MainActivity">
+
+        <com.king.app.jactionbar.JActionbar
+            android:id="@+id/actionbar"
+            android:layout_width="0dp"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="@color/white"
+            app:showIconBack="false"
+            app:titleSize="18dp"
+            app:titleColor="@color/text_title"
+            app:iconColor="@color/text_title"
+            app:supportSearch="false"
+            app:menu="@menu/main"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <FrameLayout
+            android:id="@+id/fl_ft"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/bg_bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/actionbar" />
+
+        <View
+            android:id="@+id/bg_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/tv_image"
+            style="@style/TextBtnBottom"
+            android:text="图片"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_album"
+            app:layout_constraintStart_toStartOf="@+id/bg_bottom"
+            app:layout_constraintTop_toTopOf="@+id/bg_bottom" />
+
+        <TextView
+            android:id="@+id/tv_album"
+            style="@style/TextBtnBottom"
+            android:text="相册"
+            app:layout_constraintStart_toEndOf="@+id/tv_image"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/bg_bottom"
+            app:layout_constraintTop_toTopOf="@+id/bg_bottom" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

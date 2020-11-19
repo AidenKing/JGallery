@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">JGallery</string>
+
+    <string name="ok">ok</string>
+    <string name="exit">Exit</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="loading">loading...</string>
+
+    <string name="load_from_warning_msg">Selected database or preference will cover default files, continue?</string>
+
+</resources>

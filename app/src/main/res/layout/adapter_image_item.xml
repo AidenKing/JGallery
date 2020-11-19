@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="bean"
+            type="com.king.app.jgallery.page.main.FileItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_item"
+            android:layout_width="@dimen/image_item_width"
+            android:layout_height="@dimen/image_item_width"
+            android:scaleType="centerCrop"
+            app:itemUrl="@{bean.url}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <CheckBox
+            android:id="@+id/cb_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="@{bean.check}"
+            app:layout_constraintTop_toTopOf="@+id/iv_item"
+            app:layout_constraintEnd_toEndOf="@+id/iv_item"/>
+
+        <TextView
+            android:id="@+id/tv_duration"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/bg_duration"
+            android:drawableLeft="@drawable/video_icon"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="5dp"
+            android:paddingTop="8dp"
+            android:text="@{bean.duration}"
+            android:visibility="@{bean.duration == null ? View.GONE:View.VISIBLE}"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:layout_constraintStart_toStartOf="@+id/iv_item"
+            app:layout_constraintEnd_toEndOf="@+id/iv_item"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_item"
+            tools:text="00:00"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

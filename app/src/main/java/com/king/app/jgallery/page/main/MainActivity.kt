@@ -1,19 +1,20 @@
 package com.king.app.jgallery.page.main
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import androidx.databinding.ObservableField
 import androidx.lifecycle.Observer
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseActivity
-import com.king.app.jgallery.base.EmptyViewModel
 import com.king.app.jgallery.databinding.ActivityMainBinding
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
 import com.king.app.jgallery.utils.AppUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
+
 
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
@@ -66,6 +67,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         mModel.allImages.observe(this, Observer { ftImage.showItems(it) })
         mModel.folderImages.observe(this, Observer { ftAlbum?.showAlbumItems(it) })
         mModel.onFoldersChanged.observe(this, Observer { ftAlbum?.showFolders(it) })
+        mModel.openImageBySystem.observe(this, Observer { openImageBySystem(it) })
     }
 
     private fun getSortPopup(anchorView: View): PopupMenu? {
@@ -119,4 +121,19 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         transaction.commit()
     }
 
+    private fun openImageBySystem(path: String) {
+        // 用fileProvider的方式只能对私有路径下的图片有效
+        // 用StrictMode的方式，加载Application里面
+//        val it = Intent(Intent.ACTION_VIEW)
+//        val mUri = FileProvider.getUriForFile(this, "$packageName.fileProvider", File(path))
+//        intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri)
+//        intent.flags =
+//            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+//        it.setDataAndType(mUri, "image/*")
+//        startActivity(it)
+        val it = Intent(Intent.ACTION_VIEW)
+        val mUri = Uri.parse("file://$path")
+        it.setDataAndType(mUri, "image/*")
+        startActivity(it)
+    }
 }

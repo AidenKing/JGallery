@@ -6,6 +6,7 @@ import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.king.app.jgallery.base.EmptyViewModel
+import com.king.app.jgallery.base.adapter.BaseBindingAdapter
 import com.king.app.jgallery.databinding.FragmentImageBinding
 import com.king.app.jgallery.utils.ScreenUtils
 
@@ -34,6 +35,11 @@ class ImageFragment: AbsChildFragment<FragmentImageBinding, EmptyViewModel>() {
                 var position = parent.getChildLayoutPosition(view)
                 outRect.left = if (position % 4 == 0) 0 else ScreenUtils.dp2px(1f)
                 outRect.top = if (position / 4 == 0) 0 else ScreenUtils.dp2px(1f)
+            }
+        })
+        adapter.setOnItemClickListener(object : BaseBindingAdapter.OnItemClickListener<FileItem> {
+            override fun onClickItem(view: View, position: Int, data: FileItem) {
+                getMainViewModel().openImageBySystem.value = data.url
             }
         })
         mBinding.rvList.adapter = adapter

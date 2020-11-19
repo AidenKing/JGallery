@@ -26,6 +26,7 @@ class MainViewModel(application: Application): BaseViewModel(application) {
     var titleText = ObservableField<String>()
 
     var allImages = MutableLiveData<List<FileItem>>()
+    var openImageBySystem = MutableLiveData<String>()
 
     var folderList = mutableListOf<FolderItem>()
     var onFoldersChanged = MutableLiveData<List<FolderItem>>()
@@ -147,7 +148,6 @@ class MainViewModel(application: Application): BaseViewModel(application) {
                             IMAGE_PROJECTION.get(5)
                         )
                     ) else 0
-                    DebugLog.e("media mime type:", pictureType)
                     var item = FileItem(pictureType, path)
                     if (duration > 0) {
                         item.duration = duration.toString()

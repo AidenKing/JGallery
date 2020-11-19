@@ -39,6 +39,11 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
                 outRect.top = if (position / 3 == 0) 0 else ScreenUtils.dp2px(1f)
             }
         })
+        itemAdapter.setOnItemClickListener(object : BaseBindingAdapter.OnItemClickListener<FileItem> {
+            override fun onClickItem(view: View, position: Int, data: FileItem) {
+                getMainViewModel().openImageBySystem.value = data.url
+            }
+        })
         mBinding.rvItems.adapter = itemAdapter
 
         mBinding.rvFolders.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

@@ -8,6 +8,7 @@ import android.widget.Toast
 
 import androidx.appcompat.app.AppCompatActivity
 import com.king.app.jgallery.R
+import com.king.app.jgallery.utils.ScreenUtils
 import com.king.app.jgallery.view.dialog.ProgressDialogFragment
 
 /**
@@ -31,7 +32,7 @@ abstract class RootActivity : AppCompatActivity() {
         //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         if (updateStatusBarColor()) {
-            //            ScreenUtils.setStatusBarColor(this, getResources().getColor(R.color.status_bar_bg));
+            ScreenUtils.setStatusBarColor(this, getResources().getColor(R.color.white));
         }
 
         super.onCreate(savedInstanceState)

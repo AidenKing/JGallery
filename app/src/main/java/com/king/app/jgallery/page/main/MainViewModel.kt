@@ -1,6 +1,7 @@
 package com.king.app.jgallery.page.main
 
 import android.app.Application
+import android.media.MediaMetadataRetriever
 import android.provider.MediaStore
 import android.text.TextUtils
 import androidx.core.content.ContentResolverCompat
@@ -11,10 +12,11 @@ import com.king.app.jgallery.JGApplication
 import com.king.app.jgallery.base.BaseViewModel
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
-import com.king.app.jgallery.utils.DebugLog
+import com.king.app.jgallery.utils.FormatUtil
 import com.king.app.plate.base.observer.NextErrorObserver
 import io.reactivex.rxjava3.core.Observable
 import java.io.File
+
 
 /**
  * Desc:
@@ -150,7 +152,7 @@ class MainViewModel(application: Application): BaseViewModel(application) {
                     ) else 0
                     var item = FileItem(pictureType, path)
                     if (duration > 0) {
-                        item.duration = duration.toString()
+                        item.duration = FormatUtil.formatTime(duration.toLong())
                     }
                     var folder = getImageFolder(path)
                     folder.childNum += 1
@@ -199,10 +201,11 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             files.let {
                 for (f in it) {
                     var type: String? = getFileType(f.name) ?: continue
-                    if (type == VIDEO) {
-                        // TODO 查询视频时长
-                    }
                     var item = FileItem(type!!, f.path)
+                    if (type == VIDEO) {
+                        var duration = getLocalVideoDuration(f.path)
+                        item.duration = FormatUtil.formatTime(duration.toLong())
+                    }
                     list.add(item)
                 }
             }
@@ -217,6 +220,29 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             "mp4", "avi", "mkv", "wmv", "rmvb", "mov", "mpeg", "3gp", "rm", "flv" -> VIDEO
             else -> null
         }
+    }
+
+    /**
+     * get Local video duration
+     *
+     * @return 单位是毫秒
+     */
+    private fun getLocalVideoDuration(videoPath: String): Int {
+        val duration: Int
+        try {
+            val mmr = MediaMetadataRetriever()
+            mmr.setDataSource(videoPath)
+            duration =
+                mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toInt()
+            val width =
+                mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
+            val height =
+                mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return 0
+        }
+        return duration
     }
 
     fun sortAlbum(sortType: Int) {

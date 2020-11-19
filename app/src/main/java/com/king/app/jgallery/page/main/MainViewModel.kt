@@ -5,9 +5,12 @@ import android.provider.MediaStore
 import android.text.TextUtils
 import androidx.core.content.ContentResolverCompat
 import androidx.core.os.CancellationSignal
+import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
 import com.king.app.jgallery.JGApplication
 import com.king.app.jgallery.base.BaseViewModel
+import com.king.app.jgallery.model.setting.Constants
+import com.king.app.jgallery.model.setting.SettingProperty
 import com.king.app.jgallery.utils.DebugLog
 import com.king.app.plate.base.observer.NextErrorObserver
 import io.reactivex.rxjava3.core.Observable
@@ -20,11 +23,16 @@ import java.io.File
  */
 class MainViewModel(application: Application): BaseViewModel(application) {
 
+    var titleText = ObservableField<String>()
+
     var allImages = MutableLiveData<List<FileItem>>()
 
     var folderList = mutableListOf<FolderItem>()
+    var onFoldersChanged = MutableLiveData<List<FolderItem>>()
 
     var folderImages = MutableLiveData<List<FileItem>>()
+
+    var currentFolder: FolderItem? = null
 
     val IMAGE = "image"
     val VIDEO = "video"
@@ -75,6 +83,7 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             .subscribe(object : NextErrorObserver<List<FileItem>>(getComposite()) {
                 override fun onNext(t: List<FileItem>?) {
                     allImages.value = t
+                    sortAlbum(SettingProperty.getAlbumSortType())
                 }
 
                 override fun onError(e: Throwable?) {
@@ -168,7 +177,21 @@ class MainViewModel(application: Application): BaseViewModel(application) {
         return folder
     }
 
+    fun updateTitle(title:String) {
+        titleText.set(title)
+    }
+
+    fun updateFolderTitle() {
+        if (currentFolder != null) {
+            var title = "${currentFolder!!.name}\n${currentFolder!!.childNum}张图片"
+            updateTitle(title)
+        }
+    }
+
     fun selectFolder(folderItem: FolderItem) {
+        currentFolder = folderItem
+        updateFolderTitle()
+
         var list = mutableListOf<FileItem>()
         var file = File(folderItem.path)
         if (file.exists()) {
@@ -194,6 +217,14 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             "mp4", "avi", "mkv", "wmv", "rmvb", "mov", "mpeg", "3gp", "rm", "flv" -> VIDEO
             else -> null
         }
+    }
+
+    fun sortAlbum(sortType: Int) {
+        when(sortType) {
+            Constants.SORT_TYPE_NAME -> folderList.sortBy { it.name.toLowerCase() }
+            Constants.SORT_TYPE_DATE -> folderList.sortByDescending { File(it.path).lastModified() }
+        }
+        onFoldersChanged.value = folderList
     }
 
 }

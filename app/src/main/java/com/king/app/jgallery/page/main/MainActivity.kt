@@ -1,11 +1,17 @@
 package com.king.app.jgallery.page.main
 
 import android.Manifest
+import android.view.MenuItem
+import android.view.View
+import android.widget.PopupMenu
+import androidx.databinding.ObservableField
 import androidx.lifecycle.Observer
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseActivity
 import com.king.app.jgallery.base.EmptyViewModel
 import com.king.app.jgallery.databinding.ActivityMainBinding
+import com.king.app.jgallery.model.setting.Constants
+import com.king.app.jgallery.model.setting.SettingProperty
 import com.king.app.jgallery.utils.AppUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 
@@ -20,7 +26,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     override fun createViewModel(): MainViewModel = generateViewModel(MainViewModel::class.java)
 
     override fun initView() {
-
+        mBinding.model = mModel
     }
 
     override fun initData() {
@@ -50,14 +56,43 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
         mBinding.tvImage.setOnClickListener { showImagePage() }
         mBinding.tvAlbum.setOnClickListener { showAlbumPage() }
+        mBinding.actionbar.setPopupMenuProvider { iconMenuId, anchorView ->
+            when(iconMenuId) {
+                R.id.menu_sort -> getSortPopup(anchorView!!)
+                else -> null
+            }
+        }
 
         mModel.allImages.observe(this, Observer { ftImage.showItems(it) })
-        mModel.folderImages.observe(this, Observer { ftAlbum!!.showAlbumItems(it) })
+        mModel.folderImages.observe(this, Observer { ftAlbum?.showAlbumItems(it) })
+        mModel.onFoldersChanged.observe(this, Observer { ftAlbum?.showFolders(it) })
+    }
+
+    private fun getSortPopup(anchorView: View): PopupMenu? {
+        val menu = PopupMenu(this, anchorView)
+        menu.menuInflater.inflate(R.menu.album_sort, menu.menu)
+        menu.setOnMenuItemClickListener { item: MenuItem ->
+            when (item.itemId) {
+                R.id.menu_sort_name -> {
+                    mModel.sortAlbum(Constants.SORT_TYPE_NAME)
+                    SettingProperty.setAlbumSortType(Constants.SORT_TYPE_NAME)
+                }
+                R.id.menu_sort_date -> {
+                    mModel.sortAlbum(Constants.SORT_TYPE_DATE)
+                    SettingProperty.setAlbumSortType(Constants.SORT_TYPE_DATE)
+                }
+            }
+            true
+        }
+        return menu
     }
 
     private fun showImagePage() {
         mBinding.tvImage.isSelected = true
         mBinding.tvAlbum.isSelected = false
+        mModel.updateTitle("")
+        mBinding.actionbar.removeRegisteredPopupMenu(R.id.menu_sort)
+
         var transaction = supportFragmentManager.beginTransaction()
         transaction.show(ftImage)
         if (ftAlbum != null) {
@@ -69,6 +104,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     private fun showAlbumPage() {
         mBinding.tvAlbum.isSelected = true
         mBinding.tvImage.isSelected = false
+        mModel.updateFolderTitle()
+        mBinding.actionbar.registerPopupMenu(R.id.menu_sort)
+
         var transaction = supportFragmentManager.beginTransaction()
         if (ftAlbum == null) {
             ftAlbum = AlbumFragment()

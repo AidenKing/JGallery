@@ -73,4 +73,9 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
         itemAdapter.list = it
         itemAdapter.notifyDataSetChanged()
     }
+
+    fun showFolders(it: List<FolderItem>?) {
+        folderAdapter.list = it
+        folderAdapter.notifyDataSetChanged()
+    }
 }

@@ -43,7 +43,6 @@
             android:id="@+id/tv_num"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="@{String.valueOf(bean.childNum)}"
             app:layout_constraintTop_toBottomOf="@+id/tv_name"

@@ -52,7 +52,7 @@ abstract class BaseBindingAdapter<V : ViewDataBinding, T> : RecyclerView.Adapter
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val binding = getBindingFromHolder(holder)
         onBindItem(binding, position, list!![position])
-        binding!!.executePendingBindings()
+        binding.executePendingBindings()
     }
 
     protected fun getBindingFromHolder(holder: RecyclerView.ViewHolder): V {

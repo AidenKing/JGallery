@@ -1,6 +1,7 @@
 package com.king.app.jgallery.page.main
 
 import android.Manifest
+import androidx.lifecycle.Observer
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseActivity
 import com.king.app.jgallery.base.EmptyViewModel
@@ -9,6 +10,8 @@ import com.king.app.jgallery.utils.AppUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
+
+    var ftImage = ImageFragment()
 
     override fun getContentView(): Int =
         R.layout.activity_main
@@ -39,6 +42,11 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
     private fun initCreate() {
 
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fl_ft, ftImage, "ImageFragment")
+            .commit()
+
+        mModel.allImages.observe(this, Observer { ftImage.showItems(it) })
     }
 
 }

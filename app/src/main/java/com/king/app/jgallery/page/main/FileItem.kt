@@ -10,7 +10,7 @@ import androidx.databinding.library.baseAdapters.BR
  * @date: 2020/11/19 9:22
  */
 data class FileItem(
-    var type: Int,
+    var type: String,
     var url: String,
     var duration: String? = null
 ): BaseObservable() {
@@ -21,3 +21,8 @@ data class FileItem(
             notifyPropertyChanged(BR.isCheck)
         }
 }
+data class FolderItem (
+    var name: String,
+    var path: String,
+    var childNum: Int = 0
+)

@@ -15,7 +15,7 @@ import com.king.app.jgallery.model.bean.FolderItem
  */
 class ImageFolderAdapter: BaseBindingAdapter<AdapterImgFolderItemBinding, FolderItem>() {
 
-    var selection = 0
+    var selection = -1
 
     override fun onCreateBind(
         inflater: LayoutInflater,

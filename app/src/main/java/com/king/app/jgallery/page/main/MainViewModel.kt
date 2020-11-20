@@ -86,6 +86,7 @@ class MainViewModel(application: Application): BaseViewModel(application) {
                     }
                     list.add(item)
                 }
+                list.sortByDescending { item -> File(item.url).lastModified() }
             }
         }
         folderImages.value = list

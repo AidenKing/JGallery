@@ -74,6 +74,7 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
     }
 
     override fun initData() {
+        folderAdapter.selection = 0
         folderAdapter.list = getMainViewModel().albumData.folders
         folderAdapter.setOnItemClickListener(object : BaseBindingAdapter.OnItemClickListener<FolderItem> {
             override fun onClickItem(view: View, position: Int, data: FolderItem) {
@@ -115,6 +116,11 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
             actionbar.updateMenuItemVisible(R.id.menu_move, false)
             actionbar.updateMenuItemVisible(R.id.menu_copy, false)
             actionbar.updateMenuItemVisible(R.id.menu_delete, false)
+        }
+        actionbar.setOnMenuItemListener {
+            when(it) {
+                R.id.menu_move -> getMainViewModel().moveFiles(itemAdapter.getSelectedItems())
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package com.king.app.jgallery.model
 import android.content.Context
 import android.provider.MediaStore
 import android.text.TextUtils
+import android.webkit.MimeTypeMap
 import androidx.core.content.ContentResolverCompat
 import androidx.core.os.CancellationSignal
 import com.king.app.jgallery.JGApplication
@@ -64,7 +65,11 @@ class AlbumModel {
         MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
         MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
     )
-    private val ORDER_BY = MediaStore.Files.FileColumns.DATE_ADDED + " DESC"
+
+    /**
+     * 按修改时间排序（移动的文件做了恢复modify时间的处理，按照modify date排序）
+     */
+    private val ORDER_BY = MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC"
 
     fun getAllResource(context: Context): Observable<AlbumData> = Observable.create {
 
@@ -156,6 +161,20 @@ class AlbumModel {
         folder.imgUrl = path
         data.folders.add(folder)
         return folder
+    }
+
+    /**
+     * 移动、复制图片后要通知系统扫描资源，否则ContentResolver不能及时读不到
+     */
+    fun notifyScanFile(context: Context, target: String) {
+        MediaScanner(context).scanFiles(listOf(target))
+    }
+
+    /**
+     * 移动、复制图片后要通知系统扫描资源，否则ContentResolver不能及时读不到
+     */
+    fun notifyScanFiles(context: Context, targets: List<String>) {
+        MediaScanner(context).scanFiles(targets)
     }
 
 }

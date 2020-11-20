@@ -24,4 +24,28 @@ class ImageItemAdapter: BaseBindingAdapter<AdapterImageItemBinding, FileItem>() 
         binding.bean = bean
         binding.cbCheck.visibility = if (isSelectMode) View.VISIBLE else View.GONE
     }
+
+    override fun onClickItem(v: View, position: Int, bean: FileItem) {
+        if (isSelectMode) {
+            var isCheck = bean.isCheck
+            bean.isCheck = !isCheck
+            notifyItemChanged(position)
+        }
+        else {
+            super.onClickItem(v, position, bean)
+        }
+    }
+
+    fun toggleSelect() {
+        isSelectMode = !isSelectMode
+        // 从选中到取消选中，清除已选位置
+        if (!isSelectMode) {
+            list?.let {
+                for (item in it) {
+                    item.isCheck = false
+                }
+            }
+        }
+        notifyDataSetChanged()
+    }
 }

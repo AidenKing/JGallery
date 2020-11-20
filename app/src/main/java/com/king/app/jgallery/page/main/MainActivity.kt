@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import androidx.lifecycle.Observer
+import com.king.app.jactionbar.JActionbar
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseActivity
 import com.king.app.jgallery.databinding.ActivityMainBinding
@@ -46,6 +47,10 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
                 throwable.printStackTrace()
                 finish()
             })
+    }
+
+    fun getJActionBar(): JActionbar {
+        return mBinding.actionbar
     }
 
     private fun initCreate() {
@@ -135,5 +140,16 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         val mUri = Uri.parse("file://$path")
         it.setDataAndType(mUri, "image/*")
         startActivity(it)
+    }
+
+    override fun onBackPressed() {
+        var ft = supportFragmentManager.findFragmentById(R.id.fl_ft)
+        ft.let {
+            var child = it as AbsChildFragment<*, *>
+            if (child.onBackPressed()) {
+                return
+            }
+        }
+        super.onBackPressed()
     }
 }

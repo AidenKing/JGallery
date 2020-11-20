@@ -6,6 +6,7 @@ import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.king.app.jgallery.R
 import com.king.app.jgallery.base.EmptyViewModel
 import com.king.app.jgallery.base.adapter.BaseBindingAdapter
 import com.king.app.jgallery.databinding.FragmentAlbumBinding
@@ -26,6 +27,10 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
     override fun createViewModel(): EmptyViewModel = emptyViewModel()
 
     override fun initView(view: View) {
+        super.initView(view)
+
+        toggleMenu()
+
         mBinding.rvItems.layoutManager = GridLayoutManager(context, 3)
         mBinding.rvItems.addItemDecoration(object : RecyclerView.ItemDecoration() {
             override fun getItemOffsets(
@@ -42,6 +47,12 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
         itemAdapter.setOnItemClickListener(object : BaseBindingAdapter.OnItemClickListener<FileItem> {
             override fun onClickItem(view: View, position: Int, data: FileItem) {
                 getMainViewModel().openImageBySystem.value = data.url
+            }
+        })
+        itemAdapter.setOnItemLongClickListener(object : BaseBindingAdapter.OnItemLongClickListener<FileItem> {
+            override fun onLongClickItem(view: View, position: Int, data: FileItem) {
+                itemAdapter.toggleSelect()
+                toggleMenu()
             }
         })
         mBinding.rvItems.adapter = itemAdapter
@@ -82,5 +93,35 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
     fun showFolders(it: List<FolderItem>?) {
         folderAdapter.list = it
         folderAdapter.notifyDataSetChanged()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            toggleMenu()
+        }
+    }
+
+    private fun toggleMenu() {
+        actionbar.updateMenuItemVisible(R.id.menu_sort, true)
+        if (itemAdapter.isSelectMode) {
+            actionbar.updateMenuItemVisible(R.id.menu_move, true)
+            actionbar.updateMenuItemVisible(R.id.menu_copy, true)
+            actionbar.updateMenuItemVisible(R.id.menu_delete, true)
+        }
+        else {
+            actionbar.updateMenuItemVisible(R.id.menu_move, false)
+            actionbar.updateMenuItemVisible(R.id.menu_copy, false)
+            actionbar.updateMenuItemVisible(R.id.menu_delete, false)
+        }
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (itemAdapter.isSelectMode) {
+            itemAdapter.toggleSelect()
+            toggleMenu()
+            return true
+        }
+        return false
     }
 }

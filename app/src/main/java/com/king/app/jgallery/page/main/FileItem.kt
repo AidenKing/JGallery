@@ -2,7 +2,7 @@ package com.king.app.jgallery.page.main
 
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
-import androidx.databinding.library.baseAdapters.BR
+import com.king.app.jgallery.BR
 
 /**
  * Desc:

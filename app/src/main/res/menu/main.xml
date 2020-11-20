@@ -6,4 +6,16 @@
         android:title="Settings"
         android:icon="@drawable/baseline_sort_black_24dp"
         app:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_move"
+        android:title="移动到"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_copy"
+        android:title="复制到"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_delete"
+        android:title="删除"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_setting"
+        android:title="设置"
+        app:showAsAction="never"/>
 </menu>

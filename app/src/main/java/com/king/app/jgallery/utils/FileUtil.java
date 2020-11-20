@@ -163,12 +163,13 @@ public class FileUtil {
     }
 
     /**
-     * move file from src path to target path, src will be deleted
-     * @param src
-     * @param target
+     * album_selector file from src path to target path, src will be deleted
+     * @param src file
+     * @param target folder
      */
     public static void moveFile(String src, String target) {
         File srcfFile = new File(src);
+        target = target + "/" + srcfFile.getName();
         copyFile(srcfFile, new File(target));
         srcfFile.delete();
         DebugLog.e("src[" + src + "], target[" + target + "]");

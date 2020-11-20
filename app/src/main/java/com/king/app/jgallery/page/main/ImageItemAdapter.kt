@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.king.app.jgallery.base.adapter.BaseBindingAdapter
 import com.king.app.jgallery.databinding.AdapterImageItemBinding
+import com.king.app.jgallery.model.bean.FileItem
 
 /**
  * Desc:
@@ -47,5 +48,17 @@ class ImageItemAdapter: BaseBindingAdapter<AdapterImageItemBinding, FileItem>() 
             }
         }
         notifyDataSetChanged()
+    }
+
+    fun getSelectedItems(): List<FileItem> {
+        var result = mutableListOf<FileItem>()
+        list?.let {
+            for (item in it) {
+                if (item.isCheck) {
+                    result.add(item)
+                }
+            }
+        }
+        return result
     }
 }

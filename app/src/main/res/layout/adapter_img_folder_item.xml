@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="bean"
-            type="com.king.app.jgallery.page.main.FolderItem" />
+            type="com.king.app.jgallery.model.bean.FolderItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

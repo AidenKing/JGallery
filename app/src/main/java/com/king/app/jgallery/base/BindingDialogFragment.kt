@@ -82,7 +82,7 @@ abstract class BindingDialogFragment<T : ViewDataBinding> : DialogFragment() {
     }
 
     /**
-     * move dialog
+     * album_selector dialog
      *
      * @param x
      * @param y

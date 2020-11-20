@@ -3,12 +3,14 @@ package com.king.app.jgallery.page.main
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Switch
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.EmptyViewModel
 import com.king.app.jgallery.base.adapter.BaseBindingAdapter
 import com.king.app.jgallery.databinding.FragmentImageBinding
+import com.king.app.jgallery.model.bean.FileItem
 import com.king.app.jgallery.utils.ScreenUtils
 
 /**
@@ -83,6 +85,11 @@ class ImageFragment: AbsChildFragment<FragmentImageBinding, EmptyViewModel>() {
             actionbar.updateMenuItemVisible(R.id.menu_move, false)
             actionbar.updateMenuItemVisible(R.id.menu_copy, false)
             actionbar.updateMenuItemVisible(R.id.menu_delete, false)
+        }
+        actionbar.setOnMenuItemListener {
+            when(it) {
+                R.id.menu_move -> getMainViewModel().moveFiles(adapter.getSelectedItems())
+            }
         }
     }
 

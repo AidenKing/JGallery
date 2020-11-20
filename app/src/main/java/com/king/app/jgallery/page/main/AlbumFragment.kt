@@ -10,6 +10,8 @@ import com.king.app.jgallery.R
 import com.king.app.jgallery.base.EmptyViewModel
 import com.king.app.jgallery.base.adapter.BaseBindingAdapter
 import com.king.app.jgallery.databinding.FragmentAlbumBinding
+import com.king.app.jgallery.model.bean.FileItem
+import com.king.app.jgallery.model.bean.FolderItem
 import com.king.app.jgallery.utils.ScreenUtils
 
 /**
@@ -72,7 +74,7 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
     }
 
     override fun initData() {
-        folderAdapter.list = getMainViewModel().folderList
+        folderAdapter.list = getMainViewModel().albumData.folders
         folderAdapter.setOnItemClickListener(object : BaseBindingAdapter.OnItemClickListener<FolderItem> {
             override fun onClickItem(view: View, position: Int, data: FolderItem) {
                 getMainViewModel().selectFolder(data)
@@ -80,8 +82,8 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
         })
         mBinding.rvFolders.adapter = folderAdapter
 
-        if (getMainViewModel().folderList.size > 0) {
-            getMainViewModel().selectFolder(getMainViewModel().folderList[0])
+        if (getMainViewModel().albumData.folders.size > 0) {
+            getMainViewModel().selectFolder(getMainViewModel().albumData.folders[0])
         }
     }
 

@@ -7,7 +7,7 @@
         <import type="android.view.View"/>
         <variable
             name="bean"
-            type="com.king.app.jgallery.page.main.FileItem" />
+            type="com.king.app.jgallery.model.bean.FileItem" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,6 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="@{bean.check}"
+            android:clickable="false"
             app:layout_constraintTop_toTopOf="@+id/iv_item"
             app:layout_constraintEnd_toEndOf="@+id/iv_item"/>
 
@@ -52,5 +53,14 @@
             app:layout_constraintEnd_toEndOf="@+id/iv_item"
             app:layout_constraintBottom_toBottomOf="@+id/iv_item"
             tools:text="00:00"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="@{bean.check ? View.VISIBLE:View.GONE}"
+            android:background="#33000000"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

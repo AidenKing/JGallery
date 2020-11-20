@@ -1,14 +1,19 @@
-package com.king.app.jgallery.page.main
+package com.king.app.jgallery.model.bean
 
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
-import androidx.databinding.library.baseAdapters.BR
+import com.king.app.jgallery.BR
 
 /**
  * Desc:
  * @author：Jing Yang
- * @date: 2020/11/19 9:22
+ * @date: 2020/11/20 16:51
  */
+data class AlbumData (
+    var folders: MutableList<FolderItem>,
+    var items: MutableList<FileItem>
+)
+
 data class FileItem(
     var type: String,
     var url: String,

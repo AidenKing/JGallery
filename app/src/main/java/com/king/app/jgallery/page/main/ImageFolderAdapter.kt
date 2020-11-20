@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.adapter.BaseBindingAdapter
 import com.king.app.jgallery.databinding.AdapterImgFolderItemBinding
+import com.king.app.jgallery.model.bean.FolderItem
 
 /**
  * Desc:

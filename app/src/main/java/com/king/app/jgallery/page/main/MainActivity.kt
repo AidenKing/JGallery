@@ -7,11 +7,15 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import androidx.lifecycle.Observer
+import com.king.app.jactionbar.JActionbar
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseActivity
 import com.king.app.jgallery.databinding.ActivityMainBinding
+import com.king.app.jgallery.model.bean.FileItem
+import com.king.app.jgallery.model.bean.FolderItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
+import com.king.app.jgallery.page.selector.AlbumSelectorActivity
 import com.king.app.jgallery.utils.AppUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 
@@ -48,6 +52,10 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
             })
     }
 
+    fun getJActionBar(): JActionbar {
+        return mBinding.actionbar
+    }
+
     private fun initCreate() {
 
         supportFragmentManager.beginTransaction()
@@ -68,6 +76,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         mModel.folderImages.observe(this, Observer { ftAlbum?.showAlbumItems(it) })
         mModel.onFoldersChanged.observe(this, Observer { ftAlbum?.showFolders(it) })
         mModel.openImageBySystem.observe(this, Observer { openImageBySystem(it) })
+        mModel.moveImages.observe(this, Observer { moveTo(it) })
     }
 
     private fun getSortPopup(anchorView: View): PopupMenu? {
@@ -135,5 +144,22 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         val mUri = Uri.parse("file://$path")
         it.setDataAndType(mUri, "image/*")
         startActivity(it)
+    }
+
+    override fun onBackPressed() {
+        var ft = supportFragmentManager.findFragmentById(R.id.fl_ft)
+        ft.let {
+            var child = it as AbsChildFragment<*, *>
+            if (child.onBackPressed()) {
+                return
+            }
+        }
+        super.onBackPressed()
+    }
+
+    private fun moveTo(list: Array<String>) {
+        var intent = Intent(this, AlbumSelectorActivity::class.java)
+        intent.putExtra(AlbumSelectorActivity.EXTRA_SOURCE, list)
+        startActivity(intent)
     }
 }

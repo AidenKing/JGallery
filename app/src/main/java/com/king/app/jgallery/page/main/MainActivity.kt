@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
@@ -12,6 +13,8 @@ import com.king.app.jactionbar.JActionbar
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseActivity
 import com.king.app.jgallery.databinding.ActivityMainBinding
+import com.king.app.jgallery.model.fingerprint.FingerprintHelper
+import com.king.app.jgallery.model.fingerprint.OnFingerResultListener
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
 import com.king.app.jgallery.page.selector.AlbumSelectorActivity
@@ -47,11 +50,33 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
             .subscribe({ isGrant ->
-                initCreate()
+                if (SettingProperty.isEnableFingerPrint()) {
+                    checkFingerprint()
+                }
+                else {
+                    initCreate()
+                }
             }, { throwable ->
                 throwable.printStackTrace()
                 finish()
             })
+    }
+
+    private fun checkFingerprint() {
+        var helper = FingerprintHelper()
+        helper.onFingerResultListener = object : OnFingerResultListener {
+            override fun fingerResult(result: Boolean) {
+                initCreate()
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            helper.startBiometricPromptIn28(this)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            helper.startBiometricPromptIn23(supportFragmentManager)
+        }
+        else {
+            initCreate()
+        }
     }
 
     fun getJActionBar(): JActionbar {

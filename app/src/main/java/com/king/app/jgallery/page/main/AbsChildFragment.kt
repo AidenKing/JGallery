@@ -1,11 +1,16 @@
 package com.king.app.jgallery.page.main
 
+import android.content.DialogInterface
+import android.content.Intent
 import android.view.View
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModelProviders
 import com.king.app.jactionbar.JActionbar
 import com.king.app.jgallery.base.BaseFragment
 import com.king.app.jgallery.base.BaseViewModel
+import com.king.app.jgallery.model.bean.FileItem
+import com.king.app.jgallery.page.setting.SettingsActivity
+import com.king.app.jgallery.view.dialog.SimpleDialogs
 
 /**
  * Desc:
@@ -32,5 +37,20 @@ abstract class AbsChildFragment<T: ViewDataBinding, VM: BaseViewModel>: BaseFrag
 
     open fun onBackPressed(): Boolean {
         return false
+    }
+
+    fun deleteFiles(items: List<FileItem>) {
+        if (items.isEmpty()) {
+            showMessageShort("请选择要删除的文件")
+            return
+        }
+        SimpleDialogs().showConfirmCancelDialog(context, "删除文件将不可恢复，确定删除吗？"
+            , DialogInterface.OnClickListener { dialog, which -> getMainViewModel().deleteFiles(items) }
+            , null)
+    }
+
+    fun settingPage() {
+        var intent = Intent(activity, SettingsActivity::class.java)
+        startActivity(intent)
     }
 }

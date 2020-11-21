@@ -155,6 +155,16 @@ class MainViewModel(application: Application): BaseViewModel(application) {
         copyImages.value = items.toTypedArray()
     }
 
+    fun deleteFiles(items: List<FileItem>) {
+        for (item in items) {
+            var file = File(item.url)
+            if (file.exists()) {
+                file.delete()
+            }
+        }
+        refreshPage.postValue(true)
+    }
+
     fun executeMoveTo(source: Array<FileItem>, path: String) {
         var targetList = mutableListOf<String>()
         for (item in source) {

@@ -129,6 +129,8 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
             when(it) {
                 R.id.menu_move -> getMainViewModel().moveFiles(itemAdapter.getSelectedItems())
                 R.id.menu_copy -> getMainViewModel().copyFiles(itemAdapter.getSelectedItems())
+                R.id.menu_delete -> deleteFiles(itemAdapter.getSelectedItems())
+                R.id.menu_setting -> settingPage()
             }
         }
     }

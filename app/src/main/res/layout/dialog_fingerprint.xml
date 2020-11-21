@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.king.app.jgallery.view.widget.rc.RCConstraintLayout
+        android:layout_width="@dimen/dlg_fingerprint_width"
+        android:layout_height="@dimen/dlg_fingerprint_height"
+        app:round_corner="8dp">
+
+        <!-- 直接给RCConstraintLayout设置background不管用（布局应用于DialogFragment），里面用一个View撑满才可以 -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_fingerprint"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="32dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_fingerprint_grey_700_48dp" />
+
+        <TextView
+            android:id="@+id/tv_msg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="32dp"
+            android:text="Please check you fingerprint"
+            android:textColor="@color/text_normal"
+            android:textSize="18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_fingerprint"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_fingerprint"
+            app:layout_constraintTop_toTopOf="@+id/iv_fingerprint" />
+    </com.king.app.jgallery.view.widget.rc.RCConstraintLayout>
+</layout>

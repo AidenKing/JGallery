@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="image_item_width">90dp</dimen>
+    <dimen name="dlg_fingerprint_width">320dp</dimen>
+    <dimen name="dlg_fingerprint_height">200dp</dimen>
 </resources>

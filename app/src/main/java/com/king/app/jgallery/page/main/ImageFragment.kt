@@ -100,6 +100,8 @@ class ImageFragment: AbsChildFragment<FragmentImageBinding, EmptyViewModel>() {
             when(it) {
                 R.id.menu_move -> getMainViewModel().moveFiles(adapter.getSelectedItems())
                 R.id.menu_copy -> getMainViewModel().copyFiles(adapter.getSelectedItems())
+                R.id.menu_delete -> deleteFiles(adapter.getSelectedItems())
+                R.id.menu_setting -> settingPage()
             }
         }
     }

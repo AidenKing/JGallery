@@ -99,6 +99,7 @@ class ImageFragment: AbsChildFragment<FragmentImageBinding, EmptyViewModel>() {
         actionbar.setOnMenuItemListener {
             when(it) {
                 R.id.menu_move -> getMainViewModel().moveFiles(adapter.getSelectedItems())
+                R.id.menu_copy -> getMainViewModel().copyFiles(adapter.getSelectedItems())
             }
         }
     }

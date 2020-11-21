@@ -22,6 +22,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
     val REQUEST_MOVE_TO = 1;
+    val REQUEST_COPY_TO = 2;
 
     var ftImage = ImageFragment()
     var ftAlbum: AlbumFragment? = null
@@ -78,6 +79,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         mModel.onFoldersChanged.observe(this, Observer { ftAlbum?.showFolders(it) })
         mModel.openImageBySystem.observe(this, Observer { openImageBySystem(it) })
         mModel.moveImages.observe(this, Observer { moveTo() })
+        mModel.copyImages.observe(this, Observer { copyTo() })
         mModel.refreshPage.observe(this, Observer { ftImage.refreshPage() })
     }
 
@@ -167,12 +169,24 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         startActivityForResult(intent, REQUEST_MOVE_TO)
     }
 
+    private fun copyTo() {
+        var intent = Intent(this, AlbumSelectorActivity::class.java)
+        startActivityForResult(intent, REQUEST_COPY_TO)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQUEST_MOVE_TO -> {
                 if (resultCode == Activity.RESULT_OK) {
                     mModel.executeMoveTo(mModel.moveImages.value!!, data!!.getStringExtra(AlbumSelectorActivity.DATA_FOLDER))
+                    ftImage.cancelSelection()
+                    ftAlbum?.cancelSelection()
+                }
+            }
+            REQUEST_COPY_TO -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    mModel.executeCopyTo(mModel.copyImages.value!!, data!!.getStringExtra(AlbumSelectorActivity.DATA_FOLDER))
                     ftImage.cancelSelection()
                     ftAlbum?.cancelSelection()
                 }

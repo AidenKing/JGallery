@@ -39,6 +39,7 @@ class MainViewModel(application: Application): BaseViewModel(application) {
     var folderImages = MutableLiveData<List<FileItem>>()
 
     var moveImages = MutableLiveData<Array<FileItem>>()
+    var copyImages = MutableLiveData<Array<FileItem>>()
 
     var refreshPage = MutableLiveData<Boolean>()
 
@@ -146,15 +147,20 @@ class MainViewModel(application: Application): BaseViewModel(application) {
         moveImages.value = items.toTypedArray()
     }
 
+    fun copyFiles(items: List<FileItem>) {
+        if (items.isEmpty()) {
+            messageObserver.value = "请选择要复制的文件"
+            return
+        }
+        copyImages.value = items.toTypedArray()
+    }
+
     fun executeMoveTo(source: Array<FileItem>, path: String) {
         var targetList = mutableListOf<String>()
         for (item in source) {
-            var time = File(item.url).lastModified()
             var target = FileUtil.moveFile(item.url, path)
             // 修改url
             item.url = target
-            // 移动完成后恢复lastModify（保持其日期排序位置）
-            File(target).setLastModified(time)
             targetList.add(target)
         }
         // 通知系统资源库扫描
@@ -166,6 +172,23 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             }
         })
         messageObserver.value = "移动成功"
+    }
+
+    fun executeCopyTo(source: Array<FileItem>, path: String) {
+        var targetList = mutableListOf<String>()
+        for (item in source) {
+            var target = FileUtil.copyFile(item.url, path)
+            targetList.add(target)
+        }
+        // 通知系统资源库扫描
+        albumModel.notifyScanFiles(getApplication<JGApplication>(), targetList, object : MediaScanner.OnCompleteListener {
+            // 要在资源库扫描完毕后再刷新，否则复制后的数据刷新不过来
+            override fun onComplete() {
+                DebugLog.e()
+                refreshPage.postValue(true)
+            }
+        })
+        messageObserver.value = "复制成功"
     }
 
 }

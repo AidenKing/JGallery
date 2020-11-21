@@ -128,6 +128,7 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
         actionbar.setOnMenuItemListener {
             when(it) {
                 R.id.menu_move -> getMainViewModel().moveFiles(itemAdapter.getSelectedItems())
+                R.id.menu_copy -> getMainViewModel().copyFiles(itemAdapter.getSelectedItems())
             }
         }
     }

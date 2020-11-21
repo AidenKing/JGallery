@@ -169,10 +169,27 @@ public class FileUtil {
      * @return target path
      */
     public static String moveFile(String src, String target) {
-        File srcfFile = new File(src);
-        target = target + "/" + srcfFile.getName();
-        copyFile(srcfFile, new File(target));
-        srcfFile.delete();
+        File srcFile = new File(src);
+        long lastModify = srcFile.lastModified();
+        target = target + "/" + srcFile.getName();
+        copyFile(srcFile, new File(target));
+        // 移动其实就是在copyFile的基础上删除源文件，并且移动后的文件设置为源文件的lastModify
+        srcFile.delete();
+        new File(target).setLastModified(lastModify);
+        DebugLog.e("src[" + src + "], target[" + target + "]");
+        return target;
+    }
+
+    /**
+     * copy file from src to target
+     * @param src file
+     * @param target folder
+     * @return target path
+     */
+    public static String copyFile(String src, String target) {
+        File srcFile = new File(src);
+        target = target + "/" + srcFile.getName();
+        copyFile(srcFile, new File(target));
         DebugLog.e("src[" + src + "], target[" + target + "]");
         return target;
     }

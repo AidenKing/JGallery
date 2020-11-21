@@ -139,6 +139,10 @@ class MainViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun moveFiles(items: List<FileItem>) {
+        if (items.isEmpty()) {
+            messageObserver.value = "请选择要移动的文件"
+            return
+        }
         moveImages.value = items.toTypedArray()
     }
 

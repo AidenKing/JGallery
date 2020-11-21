@@ -88,6 +88,10 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
         }
     }
 
+    fun cancelSelection() {
+        itemAdapter.cancelSelect()
+    }
+
     fun showAlbumItems(it: List<FileItem>?) {
         itemAdapter.list = it
         itemAdapter.notifyDataSetChanged()

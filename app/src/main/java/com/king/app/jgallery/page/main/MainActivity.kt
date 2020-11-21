@@ -12,8 +12,6 @@ import com.king.app.jactionbar.JActionbar
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseActivity
 import com.king.app.jgallery.databinding.ActivityMainBinding
-import com.king.app.jgallery.model.bean.FileItem
-import com.king.app.jgallery.model.bean.FolderItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
 import com.king.app.jgallery.page.selector.AlbumSelectorActivity
@@ -151,11 +149,14 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     }
 
     override fun onBackPressed() {
-        var ft = supportFragmentManager.findFragmentById(R.id.fl_ft)
-        ft.let {
-            var child = it as AbsChildFragment<*, *>
-            if (child.onBackPressed()) {
-                return
+        var fragments = supportFragmentManager.fragments
+        for (ft in fragments) {
+            if (ft.isVisible) {
+                var child = ft as AbsChildFragment<*, *>
+                if (child.onBackPressed()) {
+                    return
+                }
+                break
             }
         }
         super.onBackPressed()
@@ -172,6 +173,8 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
             REQUEST_MOVE_TO -> {
                 if (resultCode == Activity.RESULT_OK) {
                     mModel.executeMoveTo(mModel.moveImages.value!!, data!!.getStringExtra(AlbumSelectorActivity.DATA_FOLDER))
+                    ftImage.cancelSelection()
+                    ftAlbum?.cancelSelection()
                 }
             }
         }

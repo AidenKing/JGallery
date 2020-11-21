@@ -68,6 +68,10 @@ class ImageFragment: AbsChildFragment<FragmentImageBinding, EmptyViewModel>() {
         getMainViewModel().loadAll();
     }
 
+    fun cancelSelection() {
+        adapter.cancelSelect()
+    }
+
     fun showItems(it: List<FileItem>?) {
         adapter.list = it
         adapter.notifyDataSetChanged()

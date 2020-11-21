@@ -37,6 +37,12 @@ class ImageItemAdapter: BaseBindingAdapter<AdapterImageItemBinding, FileItem>() 
         }
     }
 
+    fun cancelSelect() {
+        if (isSelectMode) {
+            toggleSelect()
+        }
+    }
+
     fun toggleSelect() {
         isSelectMode = !isSelectMode
         // 从选中到取消选中，清除已选位置

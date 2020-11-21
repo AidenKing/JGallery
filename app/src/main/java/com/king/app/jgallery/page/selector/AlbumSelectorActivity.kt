@@ -1,5 +1,7 @@
 package com.king.app.jgallery.page.selector
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Rect
 import android.view.View
 import androidx.lifecycle.Observer
@@ -21,7 +23,7 @@ import com.king.app.jgallery.utils.ScreenUtils
 class AlbumSelectorActivity:BaseActivity<ActivityAlbumSelectorBinding, AlbumSelectorViewModel>() {
 
     companion object {
-        val EXTRA_SOURCE = "source"
+        val DATA_FOLDER = "folder_name"
     }
 
     var adapter = ImageFolderAdapter()
@@ -48,7 +50,10 @@ class AlbumSelectorActivity:BaseActivity<ActivityAlbumSelectorBinding, AlbumSele
         })
         adapter.setOnItemClickListener(object : BaseBindingAdapter.OnItemClickListener<FolderItem> {
             override fun onClickItem(view: View, position: Int, data: FolderItem) {
-                mModel.executeMoveTo(getSource(), data)
+                var intent = Intent()
+                intent.putExtra(DATA_FOLDER, data.path)
+                setResult(Activity.RESULT_OK, intent)
+                finish()
             }
         })
         mBinding.rvList.adapter = adapter
@@ -58,10 +63,6 @@ class AlbumSelectorActivity:BaseActivity<ActivityAlbumSelectorBinding, AlbumSele
         mModel.folderList.observe(this, Observer { showFolders(it) })
 
         mModel.loadAlbum()
-    }
-
-    private fun getSource(): Array<String> {
-        return intent.getStringArrayExtra(EXTRA_SOURCE)
     }
 
     private fun showFolders(it: List<FolderItem>?) {

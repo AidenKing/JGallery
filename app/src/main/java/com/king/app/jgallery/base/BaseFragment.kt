@@ -69,7 +69,7 @@ abstract class BaseFragment<T : ViewDataBinding, VM: BaseViewModel>: RootFragmen
 
     protected abstract fun initView(view: View)
 
-    protected abstract fun initData()
+    abstract fun initData()
 
     open fun<AC> startPage(target: Class<AC>, bundle: Bundle) {
         var intent = Intent().setClass(context!!, target)

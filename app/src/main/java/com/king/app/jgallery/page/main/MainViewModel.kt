@@ -4,13 +4,17 @@ import android.app.Application
 import android.media.MediaMetadataRetriever
 import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
+import com.king.app.jgallery.JGApplication
 import com.king.app.jgallery.base.BaseViewModel
 import com.king.app.jgallery.model.AlbumModel
+import com.king.app.jgallery.model.MediaScanner
 import com.king.app.jgallery.model.bean.AlbumData
 import com.king.app.jgallery.model.bean.FileItem
 import com.king.app.jgallery.model.bean.FolderItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
+import com.king.app.jgallery.utils.DebugLog
+import com.king.app.jgallery.utils.FileUtil
 import com.king.app.jgallery.utils.FormatUtil
 import com.king.app.plate.base.observer.NextErrorObserver
 import java.io.File
@@ -34,7 +38,9 @@ class MainViewModel(application: Application): BaseViewModel(application) {
 
     var folderImages = MutableLiveData<List<FileItem>>()
 
-    var moveImages = MutableLiveData<Array<String>>()
+    var moveImages = MutableLiveData<Array<FileItem>>()
+
+    var refreshPage = MutableLiveData<Boolean>()
 
     var currentFolder: FolderItem? = null
 
@@ -133,12 +139,29 @@ class MainViewModel(application: Application): BaseViewModel(application) {
     }
 
     fun moveFiles(items: List<FileItem>) {
-        var list = mutableListOf<String>()
-        for (item in items) {
-            list.add(item.url)
+        moveImages.value = items.toTypedArray()
+    }
+
+    fun executeMoveTo(source: Array<FileItem>, path: String) {
+        var targetList = mutableListOf<String>()
+        for (item in source) {
+            var time = File(item.url).lastModified()
+            var target = FileUtil.moveFile(item.url, path)
+            // 修改url
+            item.url = target
+            // 移动完成后恢复lastModify（保持其日期排序位置）
+            File(target).setLastModified(time)
+            targetList.add(target)
         }
-        var arrays = list.toTypedArray()
-        moveImages.value = arrays
+        // 通知系统资源库扫描
+        albumModel.notifyScanFiles(getApplication<JGApplication>(), targetList, object : MediaScanner.OnCompleteListener {
+            // 要在资源库扫描完毕后再刷新，否则移动后的数据刷新不过来
+            override fun onComplete() {
+                DebugLog.e()
+                refreshPage.postValue(true)
+            }
+        })
+        messageObserver.value = "移动成功"
     }
 
 }

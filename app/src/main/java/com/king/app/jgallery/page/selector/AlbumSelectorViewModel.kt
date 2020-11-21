@@ -38,18 +38,4 @@ class AlbumSelectorViewModel(application: Application):BaseViewModel(application
                 }
             })
     }
-
-    fun executeMoveTo(source: Array<String>, data: FolderItem) {
-        var targetList = mutableListOf<String>()
-        for (path in source) {
-            var time = File(path).lastModified()
-            var target = FileUtil.moveFile(path, data.path)
-            // 移动完成后恢复lastModify（保持其日期排序位置）
-            File(target).setLastModified(time)
-            targetList.add(target)
-        }
-        // 通知系统资源库扫描
-        albumModel.notifyScanFiles(getApplication<JGApplication>(), targetList)
-        messageObserver.value = "移动成功"
-    }
 }

@@ -96,6 +96,10 @@ class AlbumFragment:AbsChildFragment<FragmentAlbumBinding, EmptyViewModel>() {
     fun showFolders(it: List<FolderItem>?) {
         folderAdapter.list = it
         folderAdapter.notifyDataSetChanged()
+        // 重新选中当前folder
+        if (folderAdapter.selection != -1) {
+            getMainViewModel().selectFolder(getMainViewModel().albumData.folders[folderAdapter.selection])
+        }
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

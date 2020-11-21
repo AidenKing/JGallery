@@ -11,6 +11,7 @@ import com.king.app.jgallery.base.EmptyViewModel
 import com.king.app.jgallery.base.adapter.BaseBindingAdapter
 import com.king.app.jgallery.databinding.FragmentImageBinding
 import com.king.app.jgallery.model.bean.FileItem
+import com.king.app.jgallery.utils.DebugLog
 import com.king.app.jgallery.utils.ScreenUtils
 
 /**
@@ -59,6 +60,11 @@ class ImageFragment: AbsChildFragment<FragmentImageBinding, EmptyViewModel>() {
     }
 
     override fun initData() {
+        refreshPage()
+    }
+
+    fun refreshPage() {
+        DebugLog.e()
         getMainViewModel().loadAll();
     }
 

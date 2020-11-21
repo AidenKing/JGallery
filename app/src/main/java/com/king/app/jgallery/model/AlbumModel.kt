@@ -166,15 +166,15 @@ class AlbumModel {
     /**
      * 移动、复制图片后要通知系统扫描资源，否则ContentResolver不能及时读不到
      */
-    fun notifyScanFile(context: Context, target: String) {
-        MediaScanner(context).scanFiles(listOf(target))
+    fun notifyScanFile(context: Context, target: String, onCompleteListener: MediaScanner.OnCompleteListener) {
+        MediaScanner(context, onCompleteListener).scanFiles(listOf(target))
     }
 
     /**
      * 移动、复制图片后要通知系统扫描资源，否则ContentResolver不能及时读不到
      */
-    fun notifyScanFiles(context: Context, targets: List<String>) {
-        MediaScanner(context).scanFiles(targets)
+    fun notifyScanFiles(context: Context, targets: List<String>, onCompleteListener: MediaScanner.OnCompleteListener) {
+        MediaScanner(context, onCompleteListener).scanFiles(targets)
     }
 
 }

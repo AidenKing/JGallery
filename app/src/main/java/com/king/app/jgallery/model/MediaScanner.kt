@@ -17,8 +17,11 @@ class MediaScanner: MediaScannerConnection.MediaScannerConnectionClient {
      */
     var mediaScanConn: MediaScannerConnection
 
-    constructor(context: Context) {
+    var onCompleteListener: OnCompleteListener? = null
+
+    constructor(context: Context, listener: OnCompleteListener) {
         mediaScanConn = MediaScannerConnection(context, this)
+        onCompleteListener = listener
     }
 
     /**文件路径集合 */
@@ -66,6 +69,11 @@ class MediaScanner: MediaScannerConnection.MediaScannerConnectionClient {
         if (scanTimes == filePaths.size) { //如果扫描完了全部文件
             mediaScanConn.disconnect() //断开扫描服务
             scanTimes = 0 //复位计数
+            onCompleteListener?.onComplete()
         }
+    }
+
+    interface OnCompleteListener {
+        fun onComplete()
     }
 }

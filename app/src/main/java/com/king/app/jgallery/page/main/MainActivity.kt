@@ -1,6 +1,7 @@
 package com.king.app.jgallery.page.main
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.view.MenuItem
@@ -21,6 +22,8 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 
 
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
+
+    val REQUEST_MOVE_TO = 1;
 
     var ftImage = ImageFragment()
     var ftAlbum: AlbumFragment? = null
@@ -76,7 +79,8 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         mModel.folderImages.observe(this, Observer { ftAlbum?.showAlbumItems(it) })
         mModel.onFoldersChanged.observe(this, Observer { ftAlbum?.showFolders(it) })
         mModel.openImageBySystem.observe(this, Observer { openImageBySystem(it) })
-        mModel.moveImages.observe(this, Observer { moveTo(it) })
+        mModel.moveImages.observe(this, Observer { moveTo() })
+        mModel.refreshPage.observe(this, Observer { ftImage.refreshPage() })
     }
 
     private fun getSortPopup(anchorView: View): PopupMenu? {
@@ -157,9 +161,19 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         super.onBackPressed()
     }
 
-    private fun moveTo(list: Array<String>) {
+    private fun moveTo() {
         var intent = Intent(this, AlbumSelectorActivity::class.java)
-        intent.putExtra(AlbumSelectorActivity.EXTRA_SOURCE, list)
-        startActivity(intent)
+        startActivityForResult(intent, REQUEST_MOVE_TO)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQUEST_MOVE_TO -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    mModel.executeMoveTo(mModel.moveImages.value!!, data!!.getStringExtra(AlbumSelectorActivity.DATA_FOLDER))
+                }
+            }
+        }
     }
 }

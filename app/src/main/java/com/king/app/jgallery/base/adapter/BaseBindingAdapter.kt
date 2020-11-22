@@ -18,9 +18,9 @@ abstract class BaseBindingAdapter<V : ViewDataBinding, T> : RecyclerView.Adapter
 
     var list: List<T>? = null
 
-    protected var listenerClick: OnItemClickListener<T>? = null
+    var listenerClick: OnItemClickListener<T>? = null
 
-    protected var listenerLongClick: OnItemLongClickListener<T>? = null
+    var listenerLongClick: OnItemLongClickListener<T>? = null
 
     fun setOnItemClickListener(listener: OnItemClickListener<T>) {
         listenerClick = listener
@@ -37,10 +37,10 @@ abstract class BaseBindingAdapter<V : ViewDataBinding, T> : RecyclerView.Adapter
             val position = holder.layoutPosition
             onClickItem(v, position, list!![position])
         }
-        if (listenerLongClick != null) {
+        listenerLongClick?.let {
             holder.itemView.setOnLongClickListener { v ->
                 val position = holder.layoutPosition
-                listenerLongClick!!.onLongClickItem(v, position, list!![position])
+                it.onLongClickItem(v, position, list!![position])
                 true
             }
         }
@@ -55,16 +55,14 @@ abstract class BaseBindingAdapter<V : ViewDataBinding, T> : RecyclerView.Adapter
         binding.executePendingBindings()
     }
 
-    protected fun getBindingFromHolder(holder: RecyclerView.ViewHolder): V {
+    private fun getBindingFromHolder(holder: RecyclerView.ViewHolder): V {
         return DataBindingUtil.getBinding(holder.itemView)!!
     }
 
     protected abstract fun onBindItem(binding: V, position: Int, bean: T)
 
     open fun onClickItem(v: View, position: Int, bean: T) {
-        if (listenerClick != null) {
-            listenerClick!!.onClickItem(v, position, list!![position])
-        }
+        listenerClick?.onClickItem(v, position, list!![position])
     }
 
     override fun getItemCount(): Int {

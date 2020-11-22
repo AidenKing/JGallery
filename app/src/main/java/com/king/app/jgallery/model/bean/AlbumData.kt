@@ -17,7 +17,8 @@ data class AlbumData (
 data class FileItem(
     var type: String,
     var url: String,
-    var duration: String? = null
+    var duration: String? = null,
+    var lastModify: Int = 0// 从数据库里取出来的是unix时间戳，单位是秒；java date getTime单位是毫秒
 ): BaseObservable() {
     @Bindable
     var isCheck = false

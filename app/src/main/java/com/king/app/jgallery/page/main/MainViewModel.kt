@@ -17,7 +17,10 @@ import com.king.app.jgallery.utils.DebugLog
 import com.king.app.jgallery.utils.FileUtil
 import com.king.app.jgallery.utils.FormatUtil
 import com.king.app.plate.base.observer.NextErrorObserver
+import io.reactivex.rxjava3.core.ObservableSource
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -29,7 +32,7 @@ class MainViewModel(application: Application): BaseViewModel(application) {
 
     var titleText = ObservableField<String>()
 
-    var allImages = MutableLiveData<List<FileItem>>()
+    var allImages = MutableLiveData<MutableList<Any>>()
     var openImageBySystem = MutableLiveData<String>()
 
     var albumData = AlbumData(mutableListOf(), mutableListOf())
@@ -49,11 +52,14 @@ class MainViewModel(application: Application): BaseViewModel(application) {
 
     fun loadAll() {
         albumModel.getAllResource(getApplication())
+            .flatMap {
+                albumData = it
+                toRecentItems(it.items)
+            }
             .compose(applySchedulers())
-            .subscribe(object : NextErrorObserver<AlbumData>(getComposite()) {
-                override fun onNext(t: AlbumData) {
-                    albumData = t
-                    allImages.value = t.items
+            .subscribe(object : NextErrorObserver<MutableList<Any>>(getComposite()) {
+                override fun onNext(t: MutableList<Any>) {
+                    allImages.value = t
                     sortAlbum(SettingProperty.getAlbumSortType())
                 }
 
@@ -61,6 +67,24 @@ class MainViewModel(application: Application): BaseViewModel(application) {
                     messageObserver.value = e?.message
                 }
             })
+    }
+
+    private fun toRecentItems(items: MutableList<FileItem>): ObservableSource<MutableList<Any>> = ObservableSource {
+        var list = mutableListOf<Any>()
+        var sdf = SimpleDateFormat("yyyy-MM-dd", Locale.CHINA)
+        var today = sdf.format(Date())
+        var day = ""
+        for (item in items) {
+            var time = item.lastModify.toLong() * 1000
+            var itemDay = sdf.format(Date(time))
+            if (itemDay != day) {
+                day = itemDay
+                list.add(if (day == today) "今天" else day)
+            }
+            list.add(item)
+        }
+        it.onNext(list)
+        it.onComplete()
     }
 
     fun updateTitle(title:String) {

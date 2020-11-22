@@ -22,22 +22,16 @@ abstract class HeadChildBindingAdapter<VH : ViewDataBinding, VI : ViewDataBindin
 
     var list: MutableList<Any>? = null
 
-    private var onHeadClickListener: OnHeadClickListener<H>? = null
+    var onHeadClickListener: OnHeadClickListener<H>? = null
 
-    private var onItemClickListener: OnItemClickListener<I>? = null
+    var onItemClickListener: OnItemClickListener<I>? = null
+
+    var onItemLongClickListener: OnItemLongClickListener<I>? = null
 
     protected abstract val itemClass: Class<*>
 
     fun setData(list: MutableList<Any>) {
         this.list = list
-    }
-
-    fun setOnHeadClickListener(onHeadClickListener: OnHeadClickListener<H>) {
-        this.onHeadClickListener = onHeadClickListener
-    }
-
-    fun setOnItemClickListener(onItemClickListener: OnItemClickListener<I>) {
-        this.onItemClickListener = onItemClickListener
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -76,6 +70,13 @@ abstract class HeadChildBindingAdapter<VH : ViewDataBinding, VI : ViewDataBindin
                     list!![holder.layoutPosition] as I
                 )
             }
+            onItemLongClickListener?.let {
+                holder.itemView.setOnLongClickListener { v ->
+                    val position = holder.layoutPosition
+                    it.onLongClickItem(v, position, list!![holder.layoutPosition] as I)
+                    true
+                }
+            }
             return holder
         }
     }
@@ -90,13 +91,13 @@ abstract class HeadChildBindingAdapter<VH : ViewDataBinding, VI : ViewDataBindin
         parent: ViewGroup
     ): VI
 
-    protected fun onClickHead(view: View, position: Int, data: H) {
+    open fun onClickHead(view: View, position: Int, data: H) {
         if (onHeadClickListener != null) {
             onHeadClickListener!!.onClickHead(view, position, data)
         }
     }
 
-    protected fun onClickItem(view: View, position: Int, data: I) {
+    open fun onClickItem(view: View, position: Int, data: I) {
         if (onItemClickListener != null) {
             onItemClickListener!!.onClickItem(view, position, data)
         }
@@ -130,6 +131,10 @@ abstract class HeadChildBindingAdapter<VH : ViewDataBinding, VI : ViewDataBindin
 
     interface OnItemClickListener<I> {
         fun onClickItem(view: View, position: Int, data: I)
+    }
+
+    interface OnItemLongClickListener<T> {
+        fun onLongClickItem(view: View, position: Int, data: T)
     }
 
 }

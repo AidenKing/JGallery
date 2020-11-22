@@ -26,40 +26,40 @@ class AlbumModel {
         val VIDEO = "video"
     }
 
-    private val DURATION = "duration"
     private val QUERY_URI = MediaStore.Files.getContentUri("external")
     private val PROJECTION = arrayOf(
         MediaStore.Files.FileColumns._ID,
         MediaStore.MediaColumns.DATA,
         MediaStore.MediaColumns.DATE_ADDED,
+        MediaStore.MediaColumns.DATE_MODIFIED,
         MediaStore.MediaColumns.DISPLAY_NAME,
         MediaStore.MediaColumns.SIZE,
-        DURATION,
+        MediaStore.MediaColumns.DURATION,
         MediaStore.MediaColumns.MIME_TYPE,
         MediaStore.MediaColumns.WIDTH,
         MediaStore.MediaColumns.HEIGHT
     )
-    private val IMAGE_PROJECTION = arrayOf(
-        MediaStore.Images.Media._ID,
-        MediaStore.Images.Media.DATA,
-        MediaStore.Images.Media.DISPLAY_NAME,
-        MediaStore.Images.Media.DATE_ADDED,
-        MediaStore.Images.Media.WIDTH,
-        MediaStore.Images.Media.HEIGHT,
-        MediaStore.Images.Media.MIME_TYPE,
-        MediaStore.Images.Media.SIZE
-    )
-
-    private val VIDEO_PROJECTION = arrayOf(
-        MediaStore.Video.Media._ID,
-        MediaStore.Video.Media.DATA,
-        MediaStore.Video.Media.DISPLAY_NAME,
-        MediaStore.Video.Media.DATE_ADDED,
-        MediaStore.Video.Media.WIDTH,
-        MediaStore.Video.Media.HEIGHT,
-        MediaStore.Video.Media.MIME_TYPE,
-        MediaStore.Video.Media.DURATION
-    )
+//    private val IMAGE_PROJECTION = arrayOf(
+//        MediaStore.Images.Media._ID,
+//        MediaStore.Images.Media.DATA,
+//        MediaStore.Images.Media.DISPLAY_NAME,
+//        MediaStore.Images.Media.DATE_ADDED,
+//        MediaStore.Images.Media.WIDTH,
+//        MediaStore.Images.Media.HEIGHT,
+//        MediaStore.Images.Media.MIME_TYPE,
+//        MediaStore.Images.Media.SIZE
+//    )
+//
+//    private val VIDEO_PROJECTION = arrayOf(
+//        MediaStore.Video.Media._ID,
+//        MediaStore.Video.Media.DATA,
+//        MediaStore.Video.Media.DISPLAY_NAME,
+//        MediaStore.Video.Media.DATE_ADDED,
+//        MediaStore.Video.Media.WIDTH,
+//        MediaStore.Video.Media.HEIGHT,
+//        MediaStore.Video.Media.MIME_TYPE,
+//        MediaStore.Video.Media.DURATION
+//    )
 
     private val SELECTION_ALL_ARGS = arrayOf(
         MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
@@ -79,8 +79,8 @@ class AlbumModel {
 
         var videoMin = 0
         val condition: String =
-            if (videoMin > 0) "$DURATION <= $videoMin and $DURATION> 0"
-            else "$DURATION> 0"
+            if (videoMin > 0) "${MediaStore.MediaColumns.DURATION} <= $videoMin and ${MediaStore.MediaColumns.DURATION}> 0"
+            else "${MediaStore.MediaColumns.DURATION}> 0"
         val selection = ("(" + MediaStore.Files.FileColumns.MEDIA_TYPE + "=?"
                 + " OR "
                 + MediaStore.Files.FileColumns.MEDIA_TYPE + "=?" +
@@ -98,42 +98,27 @@ class AlbumModel {
             if (count > 0) {
                 data.moveToFirst()
                 do {
-                    val path: String = data.getString(
-                        data.getColumnIndexOrThrow(
-                            IMAGE_PROJECTION.get(1)
-                        )
-                    )
+                    val path = data.getString(data.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA))
                     // 如原图路径不存在或者路径存在但文件不存在,就结束当前循环
                     if (TextUtils.isEmpty(path) || !File(path).exists()) {
                         continue
                     }
-                    val pictureType: String = data.getString(
-                        data.getColumnIndexOrThrow(
-                            IMAGE_PROJECTION.get(6)
-                        )
-                    )
-                    val eqImg: Boolean = pictureType.startsWith(IMAGE)
-                    val duration = if (eqImg) 0 else data.getInt(
-                        data.getColumnIndexOrThrow(
-                            VIDEO_PROJECTION.get(7)
-                        )
-                    )
-                    val w = if (eqImg) data.getInt(
-                        data.getColumnIndexOrThrow(
-                            IMAGE_PROJECTION.get(4)
-                        )
-                    ) else 0
-                    val h = if (eqImg) data.getInt(
-                        data.getColumnIndexOrThrow(
-                            IMAGE_PROJECTION.get(5)
-                        )
-                    ) else 0
+                    val pictureType = data.getString(data.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE))
                     var item = FileItem(
                         pictureType,
                         path
                     )
-                    if (duration > 0) {
-                        item.duration = FormatUtil.formatTime(duration.toLong())
+                    item.lastModify = data.getInt(data.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED))
+                    val eqImg = pictureType.startsWith(IMAGE)
+                    if (eqImg) {
+                        val width = data.getInt(data.getColumnIndexOrThrow(MediaStore.MediaColumns.WIDTH))
+                        val height = data.getInt(data.getColumnIndexOrThrow(MediaStore.MediaColumns.HEIGHT))
+                    }
+                    else {
+                        val duration = data.getInt(data.getColumnIndexOrThrow(MediaStore.MediaColumns.DURATION))
+                        if (duration > 0) {
+                            item.duration = FormatUtil.formatTime(duration.toLong())
+                        }
                     }
                     var folder = getImageFolder(path, albumData)
                     folder.childNum += 1

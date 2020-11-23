@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_sort"
+        android:title="Sort"
+        android:icon="@drawable/baseline_sort_black_24dp"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_add"
+        android:title="Add"
+        android:icon="@drawable/baseline_add_black_24dp"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_move"
+        android:title="移动到"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_copy"
+        android:title="复制到"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_delete"
+        android:title="删除"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_shortcut"
+        android:title="添加至快捷访问"
+        app:showAsAction="never"/>
+</menu>

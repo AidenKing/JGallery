@@ -7,7 +7,9 @@ package com.king.app.jgallery.model.setting
  */
 class Constants {
     companion object{
-        val SORT_TYPE_NAME = 0
-        val SORT_TYPE_DATE = 1
+        val SORT_TYPE_NAME = 0 // 默认名称升序
+        val SORT_TYPE_DATE = 1 // 默认时间降序
+
+        val STORAGE_ROOT = "/storage/emulated/0"
     }
 }

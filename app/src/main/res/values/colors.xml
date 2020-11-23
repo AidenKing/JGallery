@@ -17,4 +17,6 @@
     <color name="white">#ffffff</color>
     <color name="folder_focus">#EFADAD</color>
     <color name="fast_scroll_bg">#2196F3</color>
+    <color name="white_bg">#efefef</color>
+    <color name="divider">#d9d9d9</color>
 </resources>

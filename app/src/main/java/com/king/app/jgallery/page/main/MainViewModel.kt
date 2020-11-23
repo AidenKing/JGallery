@@ -9,6 +9,7 @@ import com.king.app.jgallery.base.BaseViewModel
 import com.king.app.jgallery.model.AlbumModel
 import com.king.app.jgallery.model.MediaScanner
 import com.king.app.jgallery.model.bean.AlbumData
+import com.king.app.jgallery.model.bean.FileAdapterFolder
 import com.king.app.jgallery.model.bean.FileItem
 import com.king.app.jgallery.model.bean.FolderItem
 import com.king.app.jgallery.model.setting.Constants
@@ -45,6 +46,10 @@ class MainViewModel(application: Application): BaseViewModel(application) {
     var copyImages = MutableLiveData<Array<FileItem>>()
 
     var refreshPage = MutableLiveData<Boolean>()
+
+    var openFolder = MutableLiveData<String>()
+
+    var shortCuts = MutableLiveData<MutableList<Any>>()
 
     var currentFolder: FolderItem? = null
 
@@ -108,7 +113,7 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             var files = file.listFiles()
             files.let {
                 for (f in it) {
-                    var type: String? = getFileType(f.name) ?: continue
+                    var type: String? = AlbumModel.getFileType(f.name) ?: continue
                     var item =
                         FileItem(type!!, f.path)
                     if (type == AlbumModel.VIDEO) {
@@ -121,15 +126,6 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             }
         }
         folderImages.value = list
-    }
-
-    private fun getFileType(name: String): String? {
-        var extra = name.substring(name.lastIndexOf(".") + 1)
-        return when(extra) {
-            "png", "jpg", "jpeg", "gif", "bmp", "webp" -> AlbumModel.IMAGE
-            "mp4", "avi", "mkv", "wmv", "rmvb", "mov", "mpeg", "3gp", "rm", "flv" -> AlbumModel.VIDEO
-            else -> null
-        }
     }
 
     /**
@@ -223,6 +219,42 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             }
         })
         messageObserver.value = "复制成功"
+    }
+
+    fun openFolder(path: String) {
+        openFolder.value = path
+    }
+
+    fun getShortCuts() {
+        var bean = SettingProperty.getShortcut()
+        var invalidPaths = mutableListOf<String>()
+        var list = mutableListOf<Any>()
+        for (path in bean.paths) {
+            var file = File(path)
+            if (file.exists() && file.isDirectory) {
+                var item = FileAdapterFolder(file)
+                list.add(item)
+            }
+            else {
+                invalidPaths.add(path)
+            }
+        }
+        if (invalidPaths.size > 0) {
+            for (path in invalidPaths) {
+                bean.paths.remove(path)
+            }
+            SettingProperty.setShortcut(bean)
+        }
+        shortCuts.value = list
+    }
+
+    fun removeShortCut(folder: FileAdapterFolder) {
+        var bean = SettingProperty.getShortcut()
+        bean.paths.remove(folder.file.path)
+        SettingProperty.setShortcut(bean)
+        var list = shortCuts.value!!
+        list.remove(folder)
+        shortCuts.value = list
     }
 
 }

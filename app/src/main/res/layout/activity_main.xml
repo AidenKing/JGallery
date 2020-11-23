@@ -60,6 +60,15 @@
             android:text="相册"
             app:layout_constraintStart_toEndOf="@+id/tv_image"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_file"
+            app:layout_constraintTop_toTopOf="@+id/bg_bottom" />
+
+        <TextView
+            android:id="@+id/tv_file"
+            style="@style/TextBtnBottom"
+            android:text="文件"
+            app:layout_constraintStart_toEndOf="@+id/tv_album"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/bg_bottom"
             app:layout_constraintTop_toTopOf="@+id/bg_bottom" />
 

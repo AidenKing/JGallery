@@ -53,7 +53,7 @@ class AlbumSelectorViewModel(application: Application):BaseViewModel(application
      * 默认创建在/Pictures目录下
      */
     fun createAlbum(name: String) {
-        var path = "/storage/emulated/0/Pictures/$name"
+        var path = "${Constants.STORAGE_ROOT}/Pictures/$name"
         var file = File(path)
         if (file.exists()) {
             messageObserver.value = "目标相册已存在，请重新命名"

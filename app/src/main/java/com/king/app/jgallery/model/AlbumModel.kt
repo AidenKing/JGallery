@@ -24,6 +24,23 @@ class AlbumModel {
     companion object {
         val IMAGE = "image"
         val VIDEO = "video"
+
+        fun getFileType(name: String): String? {
+            var extra = name.substring(name.lastIndexOf(".") + 1)
+            return when(extra) {
+                "png", "jpg", "jpeg", "gif", "bmp", "webp" -> IMAGE
+                "mp4", "avi", "mkv", "wmv", "rmvb", "mov", "mpeg", "3gp", "rm", "flv" -> VIDEO
+                else -> null
+            }
+        }
+
+        fun isImage(name: String): Boolean {
+            return getFileType(name) == IMAGE
+        }
+
+        fun isVideo(name: String): Boolean {
+            return getFileType(name) == VIDEO
+        }
     }
 
     private val QUERY_URI = MediaStore.Files.getContentUri("external")

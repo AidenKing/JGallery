@@ -28,6 +28,8 @@ abstract class HeadChildBindingAdapter<VH : ViewDataBinding, VI : ViewDataBindin
 
     var onItemLongClickListener: OnItemLongClickListener<I>? = null
 
+    var onHeadLongClickListener: OnHeadLongClickListener<H>? = null
+
     protected abstract val itemClass: Class<*>
 
     fun setData(list: MutableList<Any>) {
@@ -58,6 +60,13 @@ abstract class HeadChildBindingAdapter<VH : ViewDataBinding, VI : ViewDataBindin
                     holder.layoutPosition,
                     list!![holder.layoutPosition] as H
                 )
+            }
+            onHeadLongClickListener?.let {
+                binding.root.setOnLongClickListener { v ->
+                    val position = holder.layoutPosition
+                    it.onLongClickHead(v, position, list!![holder.layoutPosition] as H)
+                    true
+                }
             }
             return holder
         } else {
@@ -135,6 +144,10 @@ abstract class HeadChildBindingAdapter<VH : ViewDataBinding, VI : ViewDataBindin
 
     interface OnItemLongClickListener<T> {
         fun onLongClickItem(view: View, position: Int, data: T)
+    }
+
+    interface OnHeadLongClickListener<H> {
+        fun onLongClickHead(view: View, position: Int, data: H)
     }
 
 }

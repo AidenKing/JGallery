@@ -8,6 +8,7 @@ import android.os.Build
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.king.app.jactionbar.JActionbar
 import com.king.app.jgallery.R
@@ -17,6 +18,7 @@ import com.king.app.jgallery.model.fingerprint.FingerprintHelper
 import com.king.app.jgallery.model.fingerprint.OnFingerResultListener
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
+import com.king.app.jgallery.page.file.FolderActivity
 import com.king.app.jgallery.page.selector.AlbumSelectorActivity
 import com.king.app.jgallery.utils.AppUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -26,9 +28,12 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
     val REQUEST_MOVE_TO = 1;
     val REQUEST_COPY_TO = 2;
+    val REQUEST_FOLDER = 3;
 
     var ftImage = ImageFragment()
     var ftAlbum: AlbumFragment? = null
+    var ftFile: FileHomeFragment? = null
+    var ftCurrent: Fragment = ftImage
 
     override fun getContentView(): Int =
         R.layout.activity_main
@@ -92,6 +97,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
         mBinding.tvImage.setOnClickListener { showImagePage() }
         mBinding.tvAlbum.setOnClickListener { showAlbumPage() }
+        mBinding.tvFile.setOnClickListener { showFolderPage() }
         mBinding.actionbar.setPopupMenuProvider { iconMenuId, anchorView ->
             when(iconMenuId) {
                 R.id.menu_sort -> getSortPopup(anchorView!!)
@@ -106,6 +112,7 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         mModel.moveImages.observe(this, Observer { moveTo() })
         mModel.copyImages.observe(this, Observer { copyTo() })
         mModel.refreshPage.observe(this, Observer { ftImage.refreshPage() })
+        mModel.openFolder.observe(this, Observer { openFolder(it) })
     }
 
     private fun getSortPopup(anchorView: View): PopupMenu? {
@@ -130,20 +137,23 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     private fun showImagePage() {
         mBinding.tvImage.isSelected = true
         mBinding.tvAlbum.isSelected = false
+        mBinding.tvFile.isSelected = false
         mModel.updateTitle("")
-        mBinding.actionbar.removeRegisteredPopupMenu(R.id.menu_sort)
 
         var transaction = supportFragmentManager.beginTransaction()
         transaction.show(ftImage)
-        if (ftAlbum != null) {
-            transaction.hide(ftAlbum!!)
+        if (ftCurrent != ftImage) {
+            transaction.hide(ftCurrent)
         }
         transaction.commit()
+
+        ftCurrent = ftImage
     }
 
     private fun showAlbumPage() {
         mBinding.tvAlbum.isSelected = true
         mBinding.tvImage.isSelected = false
+        mBinding.tvFile.isSelected = false
         mModel.updateFolderTitle()
         mBinding.actionbar.registerPopupMenu(R.id.menu_sort)
 
@@ -155,8 +165,37 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         else {
             transaction.show(ftAlbum!!)
         }
-        transaction.hide(ftImage)
+        if (ftCurrent != ftAlbum) {
+            transaction.hide(ftCurrent)
+        }
         transaction.commit()
+
+        ftCurrent = ftAlbum!!
+    }
+
+    private fun showFolderPage() {
+        mBinding.tvAlbum.isSelected = false
+        mBinding.tvImage.isSelected = false
+        mBinding.tvFile.isSelected = true
+        mModel.updateTitle("")
+
+        // 预加载快捷访问
+        mModel.getShortCuts()
+
+        var transaction = supportFragmentManager.beginTransaction()
+        if (ftFile == null) {
+            ftFile = FileHomeFragment()
+            transaction.add(R.id.fl_ft, ftFile!!, "FileHomeFragment")
+        }
+        else {
+            transaction.show(ftFile!!)
+        }
+        if (ftCurrent != ftFile) {
+            transaction.hide(ftCurrent)
+        }
+        transaction.commit()
+
+        ftCurrent = ftFile!!
     }
 
     private fun openImageBySystem(path: String) {
@@ -199,6 +238,12 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         startActivityForResult(intent, REQUEST_COPY_TO)
     }
 
+    private fun openFolder(path: String) {
+        var intent = Intent(this, FolderActivity::class.java)
+        intent.putExtra(FolderActivity.START_PATH, path)
+        startActivityForResult(intent, REQUEST_FOLDER)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -215,6 +260,10 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
                     ftImage.cancelSelection()
                     ftAlbum?.cancelSelection()
                 }
+            }
+            REQUEST_FOLDER -> {
+                // 刷新快捷访问
+                mModel.getShortCuts()
             }
         }
     }

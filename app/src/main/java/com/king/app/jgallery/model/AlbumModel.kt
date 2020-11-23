@@ -35,11 +35,11 @@ class AlbumModel {
         }
 
         fun isImage(name: String): Boolean {
-            return getFileType(name) == IMAGE
+            return getFileType(name.toLowerCase()) == IMAGE
         }
 
         fun isVideo(name: String): Boolean {
-            return getFileType(name) == VIDEO
+            return getFileType(name.toLowerCase()) == VIDEO
         }
     }
 

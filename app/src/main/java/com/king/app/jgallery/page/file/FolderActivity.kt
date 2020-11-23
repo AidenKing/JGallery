@@ -1,6 +1,9 @@
 package com.king.app.jgallery.page.file
 
+import android.app.Activity
 import android.content.DialogInterface
+import android.content.Intent
+import android.opengl.Visibility
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
@@ -13,9 +16,9 @@ import com.king.app.jgallery.base.adapter.HeadChildBindingAdapter
 import com.king.app.jgallery.databinding.ActivityFolderBinding
 import com.king.app.jgallery.model.bean.FileAdapterFolder
 import com.king.app.jgallery.model.bean.FileAdapterItem
-import com.king.app.jgallery.model.bean.FileItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
+import com.king.app.jgallery.page.selector.AlbumSelectorActivity
 import com.king.app.jgallery.utils.OpenFileUtil
 import com.king.app.jgallery.view.dialog.SimpleDialogs
 
@@ -29,16 +32,22 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
     companion object {
         var SELECT_MODE = "select_mode"
         val START_PATH = "start_path"
+        val DATA_SELECTED_FOLDER = "data_selected_folder"
     }
 
     var dirAdapter = DirectoryAdapter()
     var itemAdapter = FolderAdapter()
+
+    var isMovingFiles = false
+    var isCopyingFiles = false
 
     override fun getContentView(): Int = R.layout.activity_folder
 
     override fun createViewModel(): FolderViewModel = generateViewModel(FolderViewModel::class.java)
 
     override fun initView() {
+        mBinding.model = mModel
+
         mBinding.actionbar.setOnBackListener { finish() }
         mBinding.actionbar.registerPopupMenu(R.id.menu_sort)
         mBinding.actionbar.setPopupMenuProvider { iconMenuId, anchorView ->
@@ -58,10 +67,42 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
                     this@FolderActivity
                     , "新建目录"
                 ) { name -> mModel.createFolder(name) }
+                R.id.menu_move -> {
+                    if (mModel.prepareMoveFiles()) {
+                        mBinding.clCopy.visibility = View.VISIBLE
+                        mBinding.tvCopyConfirm.text = "移动到此处"
+                        isMovingFiles = true
+                        itemAdapter.cancelSelect()
+                    }
+                }
+                R.id.menu_copy -> {
+                    if (mModel.prepareCopyFiles()) {
+                        mBinding.clCopy.visibility = View.VISIBLE
+                        mBinding.tvCopyConfirm.text = "复制到此处"
+                        isCopyingFiles = true
+                        itemAdapter.cancelSelect()
+                    }
+                }
             }
         }
         toggleMenu()
 
+        mBinding.tvCopyCancel.setOnClickListener {
+            isMovingFiles = false
+            isCopyingFiles = false
+            mBinding.clCopy.visibility = View.GONE
+        }
+        mBinding.tvCopyConfirm.setOnClickListener {
+            if (isMovingFiles) {
+                mModel.executeMoveTo()
+            }
+            else if (isCopyingFiles) {
+                mModel.executeCopyTo()
+            }
+            isMovingFiles = false
+            isCopyingFiles = false
+            mBinding.clCopy.visibility = View.GONE
+        }
         mBinding.rvDir.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         mBinding.rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
@@ -74,11 +115,23 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
 
         itemAdapter.onHeadClickListener = object : HeadChildBindingAdapter.OnHeadClickListener<FileAdapterFolder> {
             override fun onClickHead(view: View, position: Int, data: FileAdapterFolder) {
-                mModel.loadDirectory(data.file.path)
+                if (isSelector()) {
+                    var intent = Intent()
+                    intent.putExtra(DATA_SELECTED_FOLDER, data.file.path)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                }
+                else {
+                    mModel.loadDirectory(data.file.path)
+                }
             }
         }
         itemAdapter.onHeadLongClickListener = object : HeadChildBindingAdapter.OnHeadLongClickListener<FileAdapterFolder> {
             override fun onLongClickHead(view: View, position: Int, data: FileAdapterFolder) {
+                // 移动、复制过程中不允许进入选择模式
+                if (isMovingFiles || isCopyingFiles) {
+                    return
+                }
                 itemAdapter.toggleSelect()
                 toggleMenu()
             }
@@ -91,6 +144,10 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
         }
         itemAdapter.onItemLongClickListener = object : HeadChildBindingAdapter.OnItemLongClickListener<FileAdapterItem> {
             override fun onLongClickItem(view: View, position: Int, data: FileAdapterItem) {
+                // 移动、复制过程中不允许进入选择模式
+                if (isMovingFiles || isCopyingFiles) {
+                    return
+                }
                 itemAdapter.toggleSelect()
                 toggleMenu()
             }
@@ -112,8 +169,10 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
             itemAdapter.notifyDataSetChanged()
         })
 
+        mModel.isOnlyFolder = isSelector()
         mModel.loadDirectory(getStartPath())
     }
+
     private fun getSortPopup(anchorView: View): PopupMenu? {
         val menu = PopupMenu(this, anchorView)
         menu.menuInflater.inflate(R.menu.album_sort, menu.menu)
@@ -147,6 +206,10 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
         return path?:Constants.STORAGE_ROOT
     }
 
+    private fun isSelector(): Boolean {
+        return intent.getBooleanExtra(SELECT_MODE, false)
+    }
+
     override fun onBackPressed() {
         when {
             itemAdapter.isSelectMode -> {
@@ -175,5 +238,4 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
             mBinding.actionbar.updateMenuItemVisible(R.id.menu_shortcut, false)
         }
     }
-
 }

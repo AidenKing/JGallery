@@ -163,34 +163,112 @@ public class FileUtil {
     }
 
     /**
-     * album_selector file from src path to target path, src will be deleted
+     * move file from src path to target path, src will be deleted
      * @param src file
      * @param target folder
      * @return target path
      */
     public static String moveFile(String src, String target) {
         File srcFile = new File(src);
+        if (srcFile.isDirectory()) {
+            return moveFolder(srcFile, target);
+        }
+        else {
+            return moveSingleFile(srcFile, target);
+        }
+    }
+
+    /**
+     * move folder(include files below) from src to target path, src folder and files included will be deleted
+     * @param src
+     * @param target
+     * @return
+     */
+    public static String moveFolder(File src, String target) {
+        File targetFolder = new File(target + "/" + src.getName());
+        targetFolder.mkdirs();
+        File[] files = src.listFiles();
+        for (File f:files) {
+            if (f.isDirectory()) {
+                moveFolder(f, targetFolder.getPath());
+            }
+            else {
+                moveSingleFile(f, targetFolder.getPath());
+            }
+        }
+        // 删除原目录
+        src.delete();
+        return targetFolder.getPath();
+    }
+
+    /**
+     * move file from src path to target path, src will be deleted
+     * @param srcFile file
+     * @param target folder
+     * @return target path
+     */
+    public static String moveSingleFile(File srcFile, String target) {
+        File targetFolder = new File(target);
+        if (!targetFolder.exists()) {
+            targetFolder.mkdirs();
+        }
         long lastModify = srcFile.lastModified();
         target = target + "/" + srcFile.getName();
         copyFile(srcFile, new File(target));
         // 移动其实就是在copyFile的基础上删除源文件，并且移动后的文件设置为源文件的lastModify
         srcFile.delete();
         new File(target).setLastModified(lastModify);
-        DebugLog.e("src[" + src + "], target[" + target + "]");
+        DebugLog.e("src[" + srcFile.getPath() + "], target[" + target + "]");
         return target;
     }
 
     /**
-     * copy file from src to target
+     * copy file from src path to target path, src will be deleted
      * @param src file
      * @param target folder
      * @return target path
      */
     public static String copyFile(String src, String target) {
         File srcFile = new File(src);
+        if (srcFile.isDirectory()) {
+            return copyFolder(srcFile, target);
+        }
+        else {
+            return copySingleFile(srcFile, target);
+        }
+    }
+
+    /**
+     * move folder(include files below) from src to target path, src folder and files included will be deleted
+     * @param src
+     * @param target
+     * @return
+     */
+    public static String copyFolder(File src, String target) {
+        File targetFolder = new File(target + "/" + src.getName());
+        targetFolder.mkdirs();
+        File[] files = src.listFiles();
+        for (File f:files) {
+            if (f.isDirectory()) {
+                copyFolder(f, targetFolder.getPath());
+            }
+            else {
+                copySingleFile(f, targetFolder.getPath());
+            }
+        }
+        return targetFolder.getPath();
+    }
+
+    /**
+     * copy file from src to target
+     * @param srcFile file
+     * @param target folder
+     * @return target path
+     */
+    public static String copySingleFile(File srcFile, String target) {
         target = target + "/" + srcFile.getName();
         copyFile(srcFile, new File(target));
-        DebugLog.e("src[" + src + "], target[" + target + "]");
+        DebugLog.e("src[" + srcFile.getPath() + "], target[" + target + "]");
         return target;
     }
 

@@ -1,14 +1,19 @@
 package com.king.app.jgallery.page.file
 
 import android.app.Application
+import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
+import com.king.app.jgallery.JGApplication
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseViewModel
 import com.king.app.jgallery.model.AlbumModel
+import com.king.app.jgallery.model.MediaScanner
 import com.king.app.jgallery.model.bean.FileAdapterFolder
 import com.king.app.jgallery.model.bean.FileAdapterItem
+import com.king.app.jgallery.model.bean.FileItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
+import com.king.app.jgallery.utils.DebugLog
 import com.king.app.jgallery.utils.FileUtil
 import com.king.app.jgallery.utils.FormatUtil
 import com.king.app.plate.base.observer.NextErrorObserver
@@ -30,13 +35,21 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
     var directories = MutableLiveData<List<FileAdapterFolder>>()
     var fileItems = MutableLiveData<MutableList<Any>>()
 
+    var movingFilesCount = ObservableField<String>()
+
     var root = File(Constants.STORAGE_ROOT)
     var currentPath: String? = null
+    var isOnlyFolder = false
     var dateFormat = SimpleDateFormat("yyyy年MM月dd日 HH:mm")
 
     var mSortType: Int = Constants.SORT_TYPE_NAME
 
     var historyStack = Stack<String>()
+
+    var moveImages = MutableLiveData<List<String>>()
+    var copyImages = MutableLiveData<List<String>>()
+
+    var albumModel = AlbumModel()
 
     fun loadDirectory(path: String) {
         loadDirectory(path, true)
@@ -121,7 +134,12 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
     private fun loadFileItems(folder: File): Observable<MutableList<Any>> = Observable.create {
 
         var itemList = mutableListOf<Any>()
-        var files = folder.listFiles()
+        var files = if (isOnlyFolder) {
+            folder.listFiles { dir, name -> dir.isDirectory}
+        }
+        else {
+            folder.listFiles()
+        }
         for (file in files) {
             if (file.isDirectory) {
                 itemList.add(FileAdapterFolder(file))
@@ -239,4 +257,87 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
         loadDirectory(currentPath!!, false)
         return true
     }
+
+    fun getSelectedPath(): List<String> {
+        var list = mutableListOf<String>()
+        fileItems.value?.let {
+            for (item in it) {
+                if (item is FileAdapterFolder) {
+                    if (item.isCheck) {
+                        list.add(item.file.path)
+                    }
+                }
+                else if (item is FileAdapterItem) {
+                    if (item.isCheck) {
+                        list.add(item.file.path)
+                    }
+                }
+            }
+        }
+        return list
+    }
+
+    fun prepareMoveFiles(): Boolean {
+        var list = getSelectedPath()
+        if (list.isEmpty()) {
+            messageObserver.value = "请选择要移动的文件"
+            return false
+        }
+        movingFilesCount.set("${list.size}个项目")
+        moveImages.value = list
+        return true
+    }
+
+    fun prepareCopyFiles(): Boolean {
+        var list = getSelectedPath()
+        if (list.isEmpty()) {
+            messageObserver.value = "请选择要复制的文件"
+            return false
+        }
+        movingFilesCount.set("${list.size}个项目")
+        copyImages.value = list
+        return true
+    }
+
+    fun executeMoveTo() {
+        moveImages.value?.let {
+            var targetList = mutableListOf<String>()
+            for (item in it) {
+                var target = FileUtil.moveFile(item, currentPath)
+                targetList.add(target)
+            }
+            // 通知系统资源库扫描
+//            albumModel.notifyScanFiles(getApplication<JGApplication>(), targetList, object : MediaScanner.OnCompleteListener {
+//                // 要在资源库扫描完毕后再刷新，否则移动后的数据刷新不过来
+//                override fun onComplete() {
+//                    DebugLog.e()
+//                    loadDirectory(currentPath!!, false)
+//                }
+//            })
+            messageObserver.value = "移动成功"
+            loadDirectory(currentPath!!, false)
+        }
+    }
+
+    fun executeCopyTo() {
+        copyImages.value?.let {
+            var targetList = mutableListOf<String>()
+            for (item in it) {
+                var target = FileUtil.copyFile(item, currentPath)
+                targetList.add(target)
+            }
+            // 通知系统资源库扫描
+//            albumModel.notifyScanFiles(getApplication<JGApplication>(), targetList, object : MediaScanner.OnCompleteListener {
+//                // 要在资源库扫描完毕后再刷新，否则复制后的数据刷新不过来
+//                override fun onComplete() {
+//                    DebugLog.e()
+//                    loadDirectory(currentPath!!, false)
+//                }
+//            })
+            messageObserver.value = "复制成功"
+            loadDirectory(currentPath!!, false)
+        }
+    }
+
+
 }

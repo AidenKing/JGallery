@@ -68,7 +68,7 @@ public class SimpleDialogs {
     public void showConfirmCancelDialog(Context context, String msg, DialogInterface.OnClickListener okListener, DialogInterface.OnClickListener cancelListener) {
         showWarningActionDialog(context, msg
                 , context.getResources().getString(R.string.ok), okListener
-                , context.getResources().getString(R.string.cancel), okListener
+                , context.getResources().getString(R.string.cancel), cancelListener
                 , null, null);
     }
 

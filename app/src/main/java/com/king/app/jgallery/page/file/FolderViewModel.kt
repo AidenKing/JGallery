@@ -9,6 +9,7 @@ import com.king.app.jgallery.model.bean.FileAdapterFolder
 import com.king.app.jgallery.model.bean.FileAdapterItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
+import com.king.app.jgallery.utils.FileUtil
 import com.king.app.jgallery.utils.FormatUtil
 import com.king.app.plate.base.observer.NextErrorObserver
 import io.reactivex.rxjava3.core.Observable
@@ -168,6 +169,9 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
         loadDirectory(currentPath!!)
     }
 
+    /**
+     * 添加至快速访问只支持文件夹
+     */
     fun addToShortcut() {
         fileItems.value?.let {
             var bean = SettingProperty.getShortcut()
@@ -203,5 +207,36 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
         } catch (e: Exception) {
             false
         }
+    }
+
+    fun deleteFiles() {
+        fileItems.value?.let {
+            for (item in it) {
+                if (item is FileAdapterFolder) {
+                    if (item.isCheck) {
+                        FileUtil.deleteFile(File(item.file.path))
+                    }
+                }
+                else if (item is FileAdapterItem) {
+                    if (item.isCheck) {
+                        FileUtil.deleteFile(File(item.file.path))
+                    }
+                }
+            }
+            messageObserver.value = "删除成功"
+            loadDirectory(currentPath!!, false)
+        }
+    }
+
+    fun createFolder(name: String?): Boolean {
+        var path = "$currentPath/$name"
+        var file = File(path)
+        if (file.exists()) {
+            messageObserver.value = "目标文件夹已存在，请重新命名"
+            return false
+        }
+        file.mkdir()
+        loadDirectory(currentPath!!, false)
+        return true
     }
 }

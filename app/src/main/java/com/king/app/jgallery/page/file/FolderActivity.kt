@@ -1,5 +1,6 @@
 package com.king.app.jgallery.page.file
 
+import android.content.DialogInterface
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
@@ -12,9 +13,11 @@ import com.king.app.jgallery.base.adapter.HeadChildBindingAdapter
 import com.king.app.jgallery.databinding.ActivityFolderBinding
 import com.king.app.jgallery.model.bean.FileAdapterFolder
 import com.king.app.jgallery.model.bean.FileAdapterItem
+import com.king.app.jgallery.model.bean.FileItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
 import com.king.app.jgallery.utils.OpenFileUtil
+import com.king.app.jgallery.view.dialog.SimpleDialogs
 
 /**
  * Desc:
@@ -50,6 +53,11 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
                     mModel.addToShortcut()
                     itemAdapter.cancelSelect()
                 }
+                R.id.menu_delete -> deleteFiles()
+                R.id.menu_add -> SimpleDialogs().openInputDialog(
+                    this@FolderActivity
+                    , "新建目录"
+                ) { name -> mModel.createFolder(name) }
             }
         }
         toggleMenu()
@@ -123,6 +131,15 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
             true
         }
         return menu
+    }
+
+    private fun deleteFiles() {
+        SimpleDialogs().showConfirmCancelDialog(this, "删除文件将不可恢复，确定删除吗？"
+            , DialogInterface.OnClickListener { dialog, which ->
+                mModel.deleteFiles()
+                itemAdapter.cancelSelect()
+            }
+            , null)
     }
 
     private fun getStartPath(): String {

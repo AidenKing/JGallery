@@ -19,7 +19,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
-        android:theme="@style/CustomActionBarTheme">
+        android:theme="@style/CustomActionBarTheme"
+        android:requestLegacyExternalStorage="true">
+        <!-- 安卓10文件存储机制修改成了沙盒模式。应用只能访问自己沙盒下的文件和公共媒体文件（文件夹不受影响）。用requestLegacyExternalStorage才能访问其他目录的文件 -->
         <activity android:name=".page.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -130,6 +130,7 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
 
     private fun initActionBar() {
         mBinding.actionbar.setOnBackListener { finish() }
+        mBinding.actionbar.setOnSearchListener { mModel.filterSearch(it) }
         mBinding.actionbar.registerPopupMenu(R.id.menu_sort)
         mBinding.actionbar.setPopupMenuProvider { iconMenuId, anchorView ->
             when(iconMenuId) {

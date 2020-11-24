@@ -22,7 +22,7 @@
             app:titleSize="18dp"
             app:titleColor="@color/text_title"
             app:iconColor="@color/text_title"
-            app:supportSearch="false"
+            app:supportSearch="true"
             app:menu="@menu/folder"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

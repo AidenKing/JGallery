@@ -32,6 +32,8 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
     var directories = MutableLiveData<List<FileAdapterFolder>>()
     var fileItems = MutableLiveData<MutableList<Any>>()
 
+    var originFileItems = mutableListOf<Any>()
+
     var movingFilesCount = ObservableField<String>()
 
     var root = File(Constants.STORAGE_ROOT)
@@ -69,7 +71,8 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
                 .flatMap { sortFiles(it) }
                 .compose(applySchedulers())
                 .subscribe(object : NextErrorObserver<MutableList<Any>>(getComposite()) {
-                    override fun onNext(t: MutableList<Any>?) {
+                    override fun onNext(t: MutableList<Any>) {
+                        originFileItems = t
                         fileItems.value = t
                     }
 
@@ -349,7 +352,7 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
             }
         }
         // 只有文件夹支持添加至快速访问
-        actionbar.updateMenuItemVisible(R.id.menu_shortcut, countFolder == list.size)
+        actionbar.updateMenuItemVisible(R.id.menu_shortcut, countFolder == list.size && countFolder > 0)
 
         // 只有一个文件夹才支持重命名
         actionbar.updateMenuItemVisible(R.id.menu_rename, countFolder == list.size && list.size == 1)
@@ -366,6 +369,21 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
         file.renameTo(dest)
         messageObserver.value = "重命名成功"
         loadDirectory(currentPath!!, false)
+    }
+
+    fun filterSearch(keyword: String) {
+        var result = if (keyword.trim().isEmpty()) {
+            originFileItems
+        } else {
+            originFileItems.filter {
+                when (it) {
+                    is FileAdapterFolder -> it.file.name.toLowerCase().contains(keyword.toLowerCase())
+                    is FileAdapterItem -> it.file.name.toLowerCase().contains(keyword.toLowerCase())
+                    else -> false
+                }
+            }
+        }
+        fileItems.value = result.toMutableList()
     }
 
 }

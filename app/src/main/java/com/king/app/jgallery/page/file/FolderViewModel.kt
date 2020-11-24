@@ -3,17 +3,14 @@ package com.king.app.jgallery.page.file
 import android.app.Application
 import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
-import com.king.app.jgallery.JGApplication
+import com.king.app.jactionbar.JActionbar
 import com.king.app.jgallery.R
 import com.king.app.jgallery.base.BaseViewModel
 import com.king.app.jgallery.model.AlbumModel
-import com.king.app.jgallery.model.MediaScanner
 import com.king.app.jgallery.model.bean.FileAdapterFolder
 import com.king.app.jgallery.model.bean.FileAdapterItem
-import com.king.app.jgallery.model.bean.FileItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
-import com.king.app.jgallery.utils.DebugLog
 import com.king.app.jgallery.utils.FileUtil
 import com.king.app.jgallery.utils.FormatUtil
 import com.king.app.plate.base.observer.NextErrorObserver
@@ -339,5 +336,36 @@ class FolderViewModel(application: Application): BaseViewModel(application) {
         }
     }
 
+    fun getToRenameFolder(): String {
+        return getSelectedPath()[0]
+    }
+
+    fun prepareMoreMenu(actionbar: JActionbar) {
+        var list = getSelectedPath()
+        var countFolder = 0
+        for (path in list) {
+            if (File(path).isDirectory) {
+                countFolder ++
+            }
+        }
+        // 只有文件夹支持添加至快速访问
+        actionbar.updateMenuItemVisible(R.id.menu_shortcut, countFolder == list.size)
+
+        // 只有一个文件夹才支持重命名
+        actionbar.updateMenuItemVisible(R.id.menu_rename, countFolder == list.size && list.size == 1)
+    }
+
+    fun renameFolder(name: String) {
+        var file = File(getToRenameFolder())
+        var dest = File("${file.parent}/$name")
+        if (dest.exists()) {
+            messageObserver.value = "目标文件已存在，请重新命名"
+            return
+        }
+        // 用renameTo有个小问题，目录下的资源会变成新增资源，无法保留原资源的lastModify
+        file.renameTo(dest)
+        messageObserver.value = "重命名成功"
+        loadDirectory(currentPath!!, false)
+    }
 
 }

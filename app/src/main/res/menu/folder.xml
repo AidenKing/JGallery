@@ -19,6 +19,9 @@
     <item android:id="@+id/menu_delete"
         android:title="删除"
         app:showAsAction="never"/>
+    <item android:id="@+id/menu_rename"
+        android:title="重命名"
+        app:showAsAction="never"/>
     <item android:id="@+id/menu_shortcut"
         android:title="添加至快捷访问"
         app:showAsAction="never"/>

@@ -3,7 +3,6 @@ package com.king.app.jgallery.page.file
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
-import android.opengl.Visibility
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
@@ -18,9 +17,9 @@ import com.king.app.jgallery.model.bean.FileAdapterFolder
 import com.king.app.jgallery.model.bean.FileAdapterItem
 import com.king.app.jgallery.model.setting.Constants
 import com.king.app.jgallery.model.setting.SettingProperty
-import com.king.app.jgallery.page.selector.AlbumSelectorActivity
 import com.king.app.jgallery.utils.OpenFileUtil
 import com.king.app.jgallery.view.dialog.SimpleDialogs
+import java.io.File
 
 /**
  * Desc:
@@ -48,64 +47,14 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
     override fun initView() {
         mBinding.model = mModel
 
-        mBinding.actionbar.setOnBackListener { finish() }
-        mBinding.actionbar.registerPopupMenu(R.id.menu_sort)
-        mBinding.actionbar.setPopupMenuProvider { iconMenuId, anchorView ->
-            when(iconMenuId) {
-                R.id.menu_sort -> getSortPopup(anchorView!!)
-                else -> null
-            }
-        }
-        mBinding.actionbar.setOnMenuItemListener {
-            when(it) {
-                R.id.menu_shortcut -> {
-                    mModel.addToShortcut()
-                    itemAdapter.cancelSelect()
-                }
-                R.id.menu_delete -> deleteFiles()
-                R.id.menu_add -> SimpleDialogs().openInputDialog(
-                    this@FolderActivity
-                    , "新建目录"
-                ) { name -> mModel.createFolder(name) }
-                R.id.menu_move -> {
-                    if (mModel.prepareMoveFiles()) {
-                        mBinding.clCopy.visibility = View.VISIBLE
-                        mBinding.tvCopyConfirm.text = "移动到此处"
-                        isMovingFiles = true
-                        itemAdapter.cancelSelect()
-                    }
-                }
-                R.id.menu_copy -> {
-                    if (mModel.prepareCopyFiles()) {
-                        mBinding.clCopy.visibility = View.VISIBLE
-                        mBinding.tvCopyConfirm.text = "复制到此处"
-                        isCopyingFiles = true
-                        itemAdapter.cancelSelect()
-                    }
-                }
-            }
-        }
-        toggleMenu()
+        initActionBar()
 
-        mBinding.tvCopyCancel.setOnClickListener {
-            isMovingFiles = false
-            isCopyingFiles = false
-            mBinding.clCopy.visibility = View.GONE
-        }
-        mBinding.tvCopyConfirm.setOnClickListener {
-            if (isMovingFiles) {
-                mModel.executeMoveTo()
-            }
-            else if (isCopyingFiles) {
-                mModel.executeCopyTo()
-            }
-            isMovingFiles = false
-            isCopyingFiles = false
-            mBinding.clCopy.visibility = View.GONE
-        }
+        initCopyBar()
+
+        initItemList()
+
+        // directory bar
         mBinding.rvDir.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        mBinding.rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
         dirAdapter.setOnItemClickListener(object : BaseBindingAdapter.OnItemClickListener<FileAdapterFolder> {
             override fun onClickItem(view: View, position: Int, data: FileAdapterFolder) {
                 mModel.loadDirectory(data.file.path)
@@ -113,6 +62,11 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
         })
         mBinding.rvDir.adapter = dirAdapter
 
+    }
+
+    private fun initItemList() {
+
+        mBinding.rvList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         itemAdapter.onHeadClickListener = object : HeadChildBindingAdapter.OnHeadClickListener<FileAdapterFolder> {
             override fun onClickHead(view: View, position: Int, data: FileAdapterFolder) {
                 if (isSelector()) {
@@ -153,6 +107,75 @@ class FolderActivity: BaseActivity<ActivityFolderBinding, FolderViewModel>() {
             }
         }
         mBinding.rvList.adapter = itemAdapter
+    }
+
+    private fun initCopyBar() {
+        mBinding.tvCopyCancel.setOnClickListener {
+            isMovingFiles = false
+            isCopyingFiles = false
+            mBinding.clCopy.visibility = View.GONE
+        }
+        mBinding.tvCopyConfirm.setOnClickListener {
+            if (isMovingFiles) {
+                mModel.executeMoveTo()
+            }
+            else if (isCopyingFiles) {
+                mModel.executeCopyTo()
+            }
+            isMovingFiles = false
+            isCopyingFiles = false
+            mBinding.clCopy.visibility = View.GONE
+        }
+    }
+
+    private fun initActionBar() {
+        mBinding.actionbar.setOnBackListener { finish() }
+        mBinding.actionbar.registerPopupMenu(R.id.menu_sort)
+        mBinding.actionbar.setPopupMenuProvider { iconMenuId, anchorView ->
+            when(iconMenuId) {
+                R.id.menu_sort -> getSortPopup(anchorView!!)
+                else -> null
+            }
+        }
+        mBinding.actionbar.setOnPrepareMoreListener { mModel.prepareMoreMenu(mBinding.actionbar) }
+        mBinding.actionbar.setOnMenuItemListener {
+            when(it) {
+                R.id.menu_shortcut -> {
+                    mModel.addToShortcut()
+                    itemAdapter.cancelSelect()
+                }
+                R.id.menu_delete -> deleteFiles()
+                R.id.menu_add -> SimpleDialogs().openInputDialog(
+                    this@FolderActivity
+                    , "新建目录"
+                ) { name -> mModel.createFolder(name) }
+                R.id.menu_rename -> SimpleDialogs().openInputDialog(
+                    this@FolderActivity
+                    , "重命名"
+                    , File(mModel.getToRenameFolder()).name
+                ) { name ->
+                    mModel.renameFolder(name)
+                    itemAdapter.cancelSelect()
+                }
+                R.id.menu_move -> {
+                    if (mModel.prepareMoveFiles()) {
+                        mBinding.clCopy.visibility = View.VISIBLE
+                        mBinding.tvCopyConfirm.text = "移动到此处"
+                        isMovingFiles = true
+                        itemAdapter.cancelSelect()
+                    }
+                }
+                R.id.menu_copy -> {
+                    if (mModel.prepareCopyFiles()) {
+                        mBinding.clCopy.visibility = View.VISIBLE
+                        mBinding.tvCopyConfirm.text = "复制到此处"
+                        isCopyingFiles = true
+                        itemAdapter.cancelSelect()
+                    }
+                }
+            }
+        }
+        toggleMenu()
     }
 
     override fun initData() {

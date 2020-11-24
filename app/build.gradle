@@ -76,7 +76,7 @@ dependencies {
     /*rx permission*/
     implementation "com.tbruyelle.rxpermissions2:rxpermissions:${RXPERMISSION_VERSION}"
 
-    implementation 'com.king.lib:jactionbar:1.1.1'
+    implementation 'com.king.lib:jactionbar:1.1.2'
 
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'

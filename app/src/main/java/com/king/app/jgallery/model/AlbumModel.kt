@@ -3,10 +3,8 @@ package com.king.app.jgallery.model
 import android.content.Context
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.webkit.MimeTypeMap
 import androidx.core.content.ContentResolverCompat
 import androidx.core.os.CancellationSignal
-import com.king.app.jgallery.JGApplication
 import com.king.app.jgallery.model.bean.AlbumData
 import com.king.app.jgallery.model.bean.FileItem
 import com.king.app.jgallery.model.bean.FolderItem
@@ -111,8 +109,8 @@ class AlbumModel {
             CancellationSignal()
         )
         if (data != null) {
-            val count: Int = data.count
-            if (count > 0) {
+            val total: Int = data.count
+            if (total > 0) {
                 data.moveToFirst()
                 do {
                     val path = data.getString(data.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA))
@@ -140,6 +138,11 @@ class AlbumModel {
                     var folder = getImageFolder(path, albumData)
                     folder.childNum += 1
                     list.add(item)
+
+                    // 为加快UI呈现进度，每加载200个就通知更新一次
+                    if (list.size % 200 == 0) {
+                        it.onNext(albumData)
+                    }
                 } while (data.moveToNext())
             }
         }

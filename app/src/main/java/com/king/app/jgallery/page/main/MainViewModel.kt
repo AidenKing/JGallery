@@ -64,12 +64,18 @@ class MainViewModel(application: Application): BaseViewModel(application) {
             .compose(applySchedulers())
             .subscribe(object : NextErrorObserver<MutableList<Any>>(getComposite()) {
                 override fun onNext(t: MutableList<Any>) {
+                    DebugLog.e("${t.size} items loaded")
                     allImages.value = t
-                    sortAlbum(SettingProperty.getAlbumSortType())
                 }
 
                 override fun onError(e: Throwable?) {
                     messageObserver.value = e?.message
+                }
+
+                override fun onComplete() {
+                    DebugLog.e("onComplete")
+                    // 全部完成再对folders进行排序
+                    sortAlbum(SettingProperty.getAlbumSortType())
                 }
             })
     }

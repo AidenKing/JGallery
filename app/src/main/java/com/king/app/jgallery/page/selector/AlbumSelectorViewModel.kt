@@ -32,11 +32,17 @@ class AlbumSelectorViewModel(application: Application):BaseViewModel(application
             .subscribe(object : NextErrorObserver<AlbumData>(getComposite()) {
                 override fun onNext(t: AlbumData) {
                     albumData = t
-                    sortAlbum(SettingProperty.getAlbumSortType())
                 }
 
                 override fun onError(e: Throwable?) {
-                    messageObserver.value = e?.message
+                    e?.printStackTrace()
+                    e?.message?.let {
+                        messageObserver.value = it
+                    }
+                }
+
+                override fun onComplete() {
+                    sortAlbum(SettingProperty.getAlbumSortType())
                 }
             })
     }

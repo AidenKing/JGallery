@@ -170,6 +170,10 @@ public class FileUtil {
      */
     public static String moveFile(String src, String target) {
         File srcFile = new File(src);
+        // 目标目录为原目录，不移动
+        if (srcFile.getParent().equals(target)) {
+            return src;
+        }
         if (srcFile.isDirectory()) {
             return moveFolder(srcFile, target);
         }
